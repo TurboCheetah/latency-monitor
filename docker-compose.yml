@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  mtr-web:
+    image: ghcr.io/turbocheetah/mtr-probe:master
+    container_name: mtr-web
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mtr-redis
+
+  mtr-worker:
+    image: ghcr.io/turbocheetah/mtr-probe:master
+    container_name: mtr-worker
+    command: celery -A mtr_probe.mtr_probe.celery worker -B --loglevel=info
+    depends_on:
+      - mtr-redis
+
+  mtr-redis:
+    container_name: mtr-redis
+    image: "redis:alpine"
+    ports:
+      - "6379:6379"
+
+networks:
+  default:
+    name: mtr-probe
+    driver: bridge

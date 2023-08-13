@@ -1,0 +1,18 @@
+FROM python:3.11-alpine
+
+WORKDIR /app
+
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
+
+RUN apk --no-cache add mtr=0.95-r2 && \
+  pip install --no-cache-dir poetry==1.5.1
+
+COPY pyproject.toml poetry.lock ./
+RUN poetry config virtualenvs.create false && poetry install --only main
+
+COPY . .
+
+EXPOSE 8080
+
+CMD ["gunicorn", "mtr_probe.mtr_probe:app", "-w", "4", "-b", "0.0.0.0:8080"]

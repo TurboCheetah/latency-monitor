@@ -2,7 +2,7 @@ import subprocess
 
 from celery import Celery
 from celery.schedules import crontab
-from flask import Flask, jsonify
+from flask import Flask, jsonify, render_template
 from redis import Redis
 
 app = Flask(__name__)
@@ -63,74 +63,7 @@ def index():
         for target, res in zip(targets, redis.mget(targets))
     }
 
-    # Construct the HTML response with responsive design
-    html_response = """
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 1000px;
-            margin: 20px auto;
-            padding: 20px;
-            border: 1px solid #e1e1e1;
-            border-radius: 5px;
-            background-color: #fafafa;
-        }
-        h1, h2, h3 {
-            color: #333;
-        }
-        pre {
-            background-color: #f7f7f7;
-            padding: 10px;
-            border-radius: 3px;
-            overflow-x: scroll;
-            white-space: pre-wrap; /* Allow content to wrap */
-            word-wrap: break-word; /* Break long words if necessary */
-        }
-        ul {
-            list-style-type: none;
-            padding-left: 0;
-        }
-        li {
-            padding: 5px 0;
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            body {
-                font-size: 0.9em; /* Reduce font size for smaller devices */
-                padding: 15px;
-            }
-            h1, h2, h3 {
-                margin-top: 15px;
-            }
-        }
-
-    </style>
-    <h1>MTR Probe</h1>
-
-    <h2>Targets:</h2>
-    <ul>
-    """
-
-    for target in targets:
-        html_response += f"<li>{target}</li>"
-
-    html_response += """
-    </ul>
-
-    <h2>Command:</h2>
-    <pre>mtr -rwznc 10 [-6] &lt;target&gt;</pre>
-
-    <h2>Results:</h2>
-    """
-
-    for target, result in results.items():
-        html_response += f"""
-        <h3>Target: {target}</h3>
-        <pre>{result}</pre>
-        """
-
-    return html_response, 200
+    return render_template("index.html", targets=targets, results=results), 200
 
 
 @app.route("/trigger-mtr")

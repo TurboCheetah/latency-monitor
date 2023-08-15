@@ -42,3 +42,16 @@ def parse_mtr(output: str, target_ip: str) -> Dict[str, Union[float, int]]:
         "worst": float(match.group("Worst")),
         "stdev": float(match.group("StDev")),
     }
+
+
+def parse_dig(output: str) -> int:
+    """Extract the query time from the dig command output."""
+
+    regex = re.compile(r"Query time:\s(?P<time>\d+)")
+
+    match = regex.search(output)
+
+    if not match:
+        raise ValueError("Query time not found in dig output")
+
+    return int(match.group("time"))

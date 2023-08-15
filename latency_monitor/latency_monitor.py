@@ -21,6 +21,10 @@ class App:
                     "task": "latency_monitor.mtr.run_mtr",
                     "schedule": crontab(minute="*/5"),
                 },
+                "dig-task": {
+                    "task": "latency_monitor.dig.run_dig",
+                    "schedule": crontab(minute="*/5"),
+                },
             },
         }
 
@@ -41,6 +45,7 @@ app = App()
 # import these so they are actually registered
 from . import routes as _  # noqa
 from . import mtr as _  # noqa
+from . import dig as _  # noqa
 
 flask = app.flask
 celery = app.celery

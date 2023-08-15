@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MTR Probe Results</title>
+    <title>Latency Monitor</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -46,7 +46,7 @@
     </style>
 </head>
 <body>
-    <h1>MTR Probe</h1>
+    <h1>Latency Monitor</h1>
     <h2>Targets:</h2>
     <ul>
         {% for target in targets %}
@@ -55,11 +55,17 @@
     </ul>
     <h2>Command:</h2>
     <pre>mtr -rwznc 10 [-6] &lt;target&gt;</pre>
-    <h2>Results:</h2>
-    {% for target, result in results.items() %}
+    <h2>MTR Results:</h2>
+    {% for target, result in mtr_results.items() %}
     <h3>Target: {{ target }}</h3>
     <pre>{{ result }}</pre>
     {% endfor %}
+    <h2>Dig Results:</h2>
+    {% for target, result in dig_results.items() %}
+    <h3>Target: {{ target }}</h3>
+    <pre>{{ result }}</pre>
+    {% endfor %}
+ 
 </body>
 </html>
 

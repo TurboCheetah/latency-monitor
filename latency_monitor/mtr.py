@@ -17,7 +17,7 @@ def run_mtr():
             cmd = ["mtr", "-rwznc", "10", "-6", target]
 
         result = subprocess.run(cmd, capture_output=True, text=True)
-        app.redis.set(target, result.stdout)
+        app.redis.set(f"mtr_{target}", result.stdout)
 
         parsed_output = parse_mtr(result.stdout, target)
 

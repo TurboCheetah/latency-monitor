@@ -23,7 +23,7 @@
   "liveNow": false,
   "panels": [
     {
-      "collapsed": true,
+      "collapsed": false,
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -31,1220 +31,1477 @@
         "y": 0
       },
       "id": 30,
-      "panels": [
-        {
-          "datasource": {
-            "type": "influxdb",
-            "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
-          },
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "fixedColor": "#795dff",
-                "mode": "fixed"
-              },
-              "custom": {
-                "axisCenteredZero": false,
-                "axisColorMode": "text",
-                "axisLabel": "",
-                "axisPlacement": "auto",
-                "barAlignment": 0,
-                "drawStyle": "line",
-                "fillOpacity": 0,
-                "gradientMode": "none",
-                "hideFrom": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": false
-                },
-                "lineInterpolation": "linear",
-                "lineStyle": {
-                  "fill": "solid"
-                },
-                "lineWidth": 1,
-                "pointSize": 5,
-                "scaleDistribution": {
-                  "type": "linear"
-                },
-                "showPoints": "auto",
-                "spanNulls": false,
-                "stacking": {
-                  "group": "A",
-                  "mode": "none"
-                },
-                "thresholdsStyle": {
-                  "mode": "off"
-                }
-              },
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green"
-                  }
-                ]
-              },
-              "unit": "ms"
-            },
-            "overrides": [
-              {
-                "matcher": {
-                  "id": "byRegexp",
-                  "options": "/avg/"
-                },
-                "properties": [
-                  {
-                    "id": "color",
-                    "value": {
-                      "fixedColor": "#5dffb0",
-                      "mode": "fixed"
-                    }
-                  }
-                ]
-              },
-              {
-                "matcher": {
-                  "id": "byRegexp",
-                  "options": "/best/"
-                },
-                "properties": [
-                  {
-                    "id": "color",
-                    "value": {
-                      "fixedColor": "#ffa65d",
-                      "mode": "fixed"
-                    }
-                  }
-                ]
-              },
-              {
-                "matcher": {
-                  "id": "byRegexp",
-                  "options": "/worst/"
-                },
-                "properties": [
-                  {
-                    "id": "color",
-                    "value": {
-                      "fixedColor": "#5caaff",
-                      "mode": "fixed"
-                    }
-                  }
-                ]
-              }
-            ]
-          },
-          "gridPos": {
-            "h": 8,
-            "w": 8,
-            "x": 0,
-            "y": 1
-          },
-          "id": 22,
-          "options": {
-            "legend": {
-              "calcs": [
-                "min",
-                "max",
-                "mean",
-                "lastNotNull"
-              ],
-              "displayMode": "table",
-              "placement": "bottom",
-              "showLegend": true
-            },
-            "tooltip": {
-              "mode": "single",
-              "sort": "none"
-            }
-          },
-          "pluginVersion": "10.0.3",
-          "targets": [
-            {
-              "datasource": {
-                "type": "influxdb",
-                "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
-              },
-              "hide": false,
-              "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"last\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"last\")",
-              "refId": "Last"
-            },
-            {
-              "datasource": {
-                "type": "influxdb",
-                "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
-              },
-              "hide": true,
-              "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"avg\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"avg\")",
-              "refId": "Avg"
-            },
-            {
-              "datasource": {
-                "type": "influxdb",
-                "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
-              },
-              "hide": true,
-              "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"best\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"best\")",
-              "refId": "Best"
-            },
-            {
-              "datasource": {
-                "type": "influxdb",
-                "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
-              },
-              "hide": true,
-              "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"worst\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"worst\")",
-              "refId": "Worst"
-            }
-          ],
-          "title": "Last",
-          "type": "timeseries"
-        },
-        {
-          "datasource": {
-            "type": "influxdb",
-            "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
-          },
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "fixedColor": "#795dff",
-                "mode": "fixed"
-              },
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green"
-                  }
-                ]
-              },
-              "unit": "ms"
-            },
-            "overrides": [
-              {
-                "matcher": {
-                  "id": "byRegexp",
-                  "options": "/avg/"
-                },
-                "properties": [
-                  {
-                    "id": "color",
-                    "value": {
-                      "fixedColor": "#5dffb0",
-                      "mode": "fixed"
-                    }
-                  }
-                ]
-              },
-              {
-                "matcher": {
-                  "id": "byRegexp",
-                  "options": "/best/"
-                },
-                "properties": [
-                  {
-                    "id": "color",
-                    "value": {
-                      "fixedColor": "#ffa65d",
-                      "mode": "fixed"
-                    }
-                  }
-                ]
-              },
-              {
-                "matcher": {
-                  "id": "byRegexp",
-                  "options": "/worst/"
-                },
-                "properties": [
-                  {
-                    "id": "color",
-                    "value": {
-                      "fixedColor": "#5caaff",
-                      "mode": "fixed"
-                    }
-                  }
-                ]
-              }
-            ]
-          },
-          "gridPos": {
-            "h": 8,
-            "w": 4,
-            "x": 8,
-            "y": 1
-          },
-          "id": 23,
-          "options": {
-            "colorMode": "value",
-            "graphMode": "none",
-            "justifyMode": "auto",
-            "orientation": "auto",
-            "reduceOptions": {
-              "calcs": [
-                "lastNotNull"
-              ],
-              "fields": "",
-              "values": false
-            },
-            "textMode": "auto"
-          },
-          "pluginVersion": "10.0.3",
-          "targets": [
-            {
-              "datasource": {
-                "type": "influxdb",
-                "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
-              },
-              "hide": false,
-              "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"last\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"last\")",
-              "refId": "Last"
-            },
-            {
-              "datasource": {
-                "type": "influxdb",
-                "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
-              },
-              "hide": true,
-              "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"avg\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"avg\")",
-              "refId": "Avg"
-            },
-            {
-              "datasource": {
-                "type": "influxdb",
-                "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
-              },
-              "hide": true,
-              "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"best\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"best\")",
-              "refId": "Best"
-            },
-            {
-              "datasource": {
-                "type": "influxdb",
-                "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
-              },
-              "hide": true,
-              "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"worst\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"worst\")",
-              "refId": "Worst"
-            }
-          ],
-          "title": "Last",
-          "type": "stat"
-        },
-        {
-          "datasource": {
-            "type": "influxdb",
-            "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
-          },
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "fixedColor": "#795dff",
-                "mode": "fixed"
-              },
-              "custom": {
-                "axisCenteredZero": false,
-                "axisColorMode": "text",
-                "axisLabel": "",
-                "axisPlacement": "auto",
-                "barAlignment": 0,
-                "drawStyle": "line",
-                "fillOpacity": 0,
-                "gradientMode": "none",
-                "hideFrom": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": false
-                },
-                "lineInterpolation": "linear",
-                "lineStyle": {
-                  "fill": "solid"
-                },
-                "lineWidth": 1,
-                "pointSize": 5,
-                "scaleDistribution": {
-                  "type": "linear"
-                },
-                "showPoints": "auto",
-                "spanNulls": false,
-                "stacking": {
-                  "group": "A",
-                  "mode": "none"
-                },
-                "thresholdsStyle": {
-                  "mode": "off"
-                }
-              },
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green"
-                  }
-                ]
-              },
-              "unit": "ms"
-            },
-            "overrides": [
-              {
-                "matcher": {
-                  "id": "byRegexp",
-                  "options": "/avg/"
-                },
-                "properties": [
-                  {
-                    "id": "color",
-                    "value": {
-                      "fixedColor": "#5dffb0",
-                      "mode": "fixed"
-                    }
-                  }
-                ]
-              },
-              {
-                "matcher": {
-                  "id": "byRegexp",
-                  "options": "/best/"
-                },
-                "properties": [
-                  {
-                    "id": "color",
-                    "value": {
-                      "fixedColor": "#ffa65d",
-                      "mode": "fixed"
-                    }
-                  }
-                ]
-              },
-              {
-                "matcher": {
-                  "id": "byRegexp",
-                  "options": "/worst/"
-                },
-                "properties": [
-                  {
-                    "id": "color",
-                    "value": {
-                      "fixedColor": "#5caaff",
-                      "mode": "fixed"
-                    }
-                  }
-                ]
-              }
-            ]
-          },
-          "gridPos": {
-            "h": 8,
-            "w": 8,
-            "x": 12,
-            "y": 1
-          },
-          "id": 24,
-          "options": {
-            "legend": {
-              "calcs": [
-                "min",
-                "max",
-                "mean",
-                "lastNotNull"
-              ],
-              "displayMode": "table",
-              "placement": "bottom",
-              "showLegend": true
-            },
-            "tooltip": {
-              "mode": "single",
-              "sort": "none"
-            }
-          },
-          "pluginVersion": "10.0.3",
-          "targets": [
-            {
-              "datasource": {
-                "type": "influxdb",
-                "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
-              },
-              "hide": true,
-              "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"last\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"last\")",
-              "refId": "Last"
-            },
-            {
-              "datasource": {
-                "type": "influxdb",
-                "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
-              },
-              "hide": false,
-              "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"avg\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"avg\")",
-              "refId": "Avg"
-            },
-            {
-              "datasource": {
-                "type": "influxdb",
-                "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
-              },
-              "hide": true,
-              "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"best\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"best\")",
-              "refId": "Best"
-            },
-            {
-              "datasource": {
-                "type": "influxdb",
-                "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
-              },
-              "hide": true,
-              "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"worst\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"worst\")",
-              "refId": "Worst"
-            }
-          ],
-          "title": "Avg",
-          "type": "timeseries"
-        },
-        {
-          "datasource": {
-            "type": "influxdb",
-            "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
-          },
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "fixedColor": "#795dff",
-                "mode": "fixed"
-              },
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green"
-                  }
-                ]
-              },
-              "unit": "ms"
-            },
-            "overrides": [
-              {
-                "matcher": {
-                  "id": "byRegexp",
-                  "options": "/avg/"
-                },
-                "properties": [
-                  {
-                    "id": "color",
-                    "value": {
-                      "fixedColor": "#5dffb0",
-                      "mode": "fixed"
-                    }
-                  }
-                ]
-              },
-              {
-                "matcher": {
-                  "id": "byRegexp",
-                  "options": "/best/"
-                },
-                "properties": [
-                  {
-                    "id": "color",
-                    "value": {
-                      "fixedColor": "#ffa65d",
-                      "mode": "fixed"
-                    }
-                  }
-                ]
-              },
-              {
-                "matcher": {
-                  "id": "byRegexp",
-                  "options": "/worst/"
-                },
-                "properties": [
-                  {
-                    "id": "color",
-                    "value": {
-                      "fixedColor": "#5caaff",
-                      "mode": "fixed"
-                    }
-                  }
-                ]
-              }
-            ]
-          },
-          "gridPos": {
-            "h": 8,
-            "w": 4,
-            "x": 20,
-            "y": 1
-          },
-          "id": 25,
-          "options": {
-            "colorMode": "value",
-            "graphMode": "none",
-            "justifyMode": "auto",
-            "orientation": "auto",
-            "reduceOptions": {
-              "calcs": [
-                "lastNotNull"
-              ],
-              "fields": "",
-              "values": false
-            },
-            "textMode": "auto"
-          },
-          "pluginVersion": "10.0.3",
-          "targets": [
-            {
-              "datasource": {
-                "type": "influxdb",
-                "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
-              },
-              "hide": true,
-              "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"last\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"last\")",
-              "refId": "Last"
-            },
-            {
-              "datasource": {
-                "type": "influxdb",
-                "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
-              },
-              "hide": false,
-              "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"avg\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"avg\")",
-              "refId": "Avg"
-            },
-            {
-              "datasource": {
-                "type": "influxdb",
-                "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
-              },
-              "hide": true,
-              "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"best\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"best\")",
-              "refId": "Best"
-            },
-            {
-              "datasource": {
-                "type": "influxdb",
-                "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
-              },
-              "hide": true,
-              "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"worst\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"worst\")",
-              "refId": "Worst"
-            }
-          ],
-          "title": "Avg",
-          "type": "stat"
-        },
-        {
-          "datasource": {
-            "type": "influxdb",
-            "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
-          },
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "fixedColor": "#795dff",
-                "mode": "fixed"
-              },
-              "custom": {
-                "axisCenteredZero": false,
-                "axisColorMode": "text",
-                "axisLabel": "",
-                "axisPlacement": "auto",
-                "barAlignment": 0,
-                "drawStyle": "line",
-                "fillOpacity": 0,
-                "gradientMode": "none",
-                "hideFrom": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": false
-                },
-                "lineInterpolation": "linear",
-                "lineStyle": {
-                  "fill": "solid"
-                },
-                "lineWidth": 1,
-                "pointSize": 5,
-                "scaleDistribution": {
-                  "type": "linear"
-                },
-                "showPoints": "auto",
-                "spanNulls": false,
-                "stacking": {
-                  "group": "A",
-                  "mode": "none"
-                },
-                "thresholdsStyle": {
-                  "mode": "off"
-                }
-              },
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green"
-                  }
-                ]
-              },
-              "unit": "ms"
-            },
-            "overrides": [
-              {
-                "matcher": {
-                  "id": "byRegexp",
-                  "options": "/avg/"
-                },
-                "properties": [
-                  {
-                    "id": "color",
-                    "value": {
-                      "fixedColor": "#5dffb0",
-                      "mode": "fixed"
-                    }
-                  }
-                ]
-              },
-              {
-                "matcher": {
-                  "id": "byRegexp",
-                  "options": "/best/"
-                },
-                "properties": [
-                  {
-                    "id": "color",
-                    "value": {
-                      "fixedColor": "#ffa65d",
-                      "mode": "fixed"
-                    }
-                  }
-                ]
-              },
-              {
-                "matcher": {
-                  "id": "byRegexp",
-                  "options": "/worst/"
-                },
-                "properties": [
-                  {
-                    "id": "color",
-                    "value": {
-                      "fixedColor": "#5caaff",
-                      "mode": "fixed"
-                    }
-                  }
-                ]
-              }
-            ]
-          },
-          "gridPos": {
-            "h": 8,
-            "w": 8,
-            "x": 0,
-            "y": 9
-          },
-          "id": 26,
-          "options": {
-            "legend": {
-              "calcs": [
-                "min",
-                "max",
-                "mean",
-                "lastNotNull"
-              ],
-              "displayMode": "table",
-              "placement": "bottom",
-              "showLegend": true
-            },
-            "tooltip": {
-              "mode": "single",
-              "sort": "none"
-            }
-          },
-          "pluginVersion": "10.0.3",
-          "targets": [
-            {
-              "datasource": {
-                "type": "influxdb",
-                "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
-              },
-              "hide": true,
-              "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"last\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"last\")",
-              "refId": "Last"
-            },
-            {
-              "datasource": {
-                "type": "influxdb",
-                "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
-              },
-              "hide": true,
-              "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"avg\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"avg\")",
-              "refId": "Avg"
-            },
-            {
-              "datasource": {
-                "type": "influxdb",
-                "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
-              },
-              "hide": false,
-              "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"best\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"best\")",
-              "refId": "Best"
-            },
-            {
-              "datasource": {
-                "type": "influxdb",
-                "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
-              },
-              "hide": true,
-              "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"worst\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"worst\")",
-              "refId": "Worst"
-            }
-          ],
-          "title": "Best",
-          "type": "timeseries"
-        },
-        {
-          "datasource": {
-            "type": "influxdb",
-            "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
-          },
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "fixedColor": "#795dff",
-                "mode": "fixed"
-              },
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green"
-                  }
-                ]
-              },
-              "unit": "ms"
-            },
-            "overrides": [
-              {
-                "matcher": {
-                  "id": "byRegexp",
-                  "options": "/avg/"
-                },
-                "properties": [
-                  {
-                    "id": "color",
-                    "value": {
-                      "fixedColor": "#5dffb0",
-                      "mode": "fixed"
-                    }
-                  }
-                ]
-              },
-              {
-                "matcher": {
-                  "id": "byRegexp",
-                  "options": "/best/"
-                },
-                "properties": [
-                  {
-                    "id": "color",
-                    "value": {
-                      "fixedColor": "#ffa65d",
-                      "mode": "fixed"
-                    }
-                  }
-                ]
-              },
-              {
-                "matcher": {
-                  "id": "byRegexp",
-                  "options": "/worst/"
-                },
-                "properties": [
-                  {
-                    "id": "color",
-                    "value": {
-                      "fixedColor": "#5caaff",
-                      "mode": "fixed"
-                    }
-                  }
-                ]
-              }
-            ]
-          },
-          "gridPos": {
-            "h": 8,
-            "w": 4,
-            "x": 8,
-            "y": 9
-          },
-          "id": 27,
-          "options": {
-            "colorMode": "value",
-            "graphMode": "none",
-            "justifyMode": "auto",
-            "orientation": "auto",
-            "reduceOptions": {
-              "calcs": [
-                "lastNotNull"
-              ],
-              "fields": "",
-              "values": false
-            },
-            "textMode": "auto"
-          },
-          "pluginVersion": "10.0.3",
-          "targets": [
-            {
-              "datasource": {
-                "type": "influxdb",
-                "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
-              },
-              "hide": true,
-              "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"last\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"last\")",
-              "refId": "Last"
-            },
-            {
-              "datasource": {
-                "type": "influxdb",
-                "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
-              },
-              "hide": true,
-              "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"avg\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"avg\")",
-              "refId": "Avg"
-            },
-            {
-              "datasource": {
-                "type": "influxdb",
-                "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
-              },
-              "hide": false,
-              "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"best\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"best\")",
-              "refId": "Best"
-            },
-            {
-              "datasource": {
-                "type": "influxdb",
-                "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
-              },
-              "hide": true,
-              "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"worst\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"worst\")",
-              "refId": "Worst"
-            }
-          ],
-          "title": "Best",
-          "type": "stat"
-        },
-        {
-          "datasource": {
-            "type": "influxdb",
-            "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
-          },
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "fixedColor": "#795dff",
-                "mode": "fixed"
-              },
-              "custom": {
-                "axisCenteredZero": false,
-                "axisColorMode": "text",
-                "axisLabel": "",
-                "axisPlacement": "auto",
-                "barAlignment": 0,
-                "drawStyle": "line",
-                "fillOpacity": 0,
-                "gradientMode": "none",
-                "hideFrom": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": false
-                },
-                "lineInterpolation": "linear",
-                "lineStyle": {
-                  "fill": "solid"
-                },
-                "lineWidth": 1,
-                "pointSize": 5,
-                "scaleDistribution": {
-                  "type": "linear"
-                },
-                "showPoints": "auto",
-                "spanNulls": false,
-                "stacking": {
-                  "group": "A",
-                  "mode": "none"
-                },
-                "thresholdsStyle": {
-                  "mode": "off"
-                }
-              },
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green"
-                  }
-                ]
-              },
-              "unit": "ms"
-            },
-            "overrides": [
-              {
-                "matcher": {
-                  "id": "byRegexp",
-                  "options": "/avg/"
-                },
-                "properties": [
-                  {
-                    "id": "color",
-                    "value": {
-                      "fixedColor": "#5dffb0",
-                      "mode": "fixed"
-                    }
-                  }
-                ]
-              },
-              {
-                "matcher": {
-                  "id": "byRegexp",
-                  "options": "/best/"
-                },
-                "properties": [
-                  {
-                    "id": "color",
-                    "value": {
-                      "fixedColor": "#ffa65d",
-                      "mode": "fixed"
-                    }
-                  }
-                ]
-              },
-              {
-                "matcher": {
-                  "id": "byRegexp",
-                  "options": "/worst/"
-                },
-                "properties": [
-                  {
-                    "id": "color",
-                    "value": {
-                      "fixedColor": "#5caaff",
-                      "mode": "fixed"
-                    }
-                  }
-                ]
-              }
-            ]
-          },
-          "gridPos": {
-            "h": 8,
-            "w": 8,
-            "x": 12,
-            "y": 9
-          },
-          "id": 28,
-          "options": {
-            "legend": {
-              "calcs": [
-                "min",
-                "max",
-                "mean",
-                "lastNotNull"
-              ],
-              "displayMode": "table",
-              "placement": "bottom",
-              "showLegend": true
-            },
-            "tooltip": {
-              "mode": "single",
-              "sort": "none"
-            }
-          },
-          "pluginVersion": "10.0.3",
-          "targets": [
-            {
-              "datasource": {
-                "type": "influxdb",
-                "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
-              },
-              "hide": true,
-              "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"last\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"last\")",
-              "refId": "Last"
-            },
-            {
-              "datasource": {
-                "type": "influxdb",
-                "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
-              },
-              "hide": true,
-              "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"avg\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"avg\")",
-              "refId": "Avg"
-            },
-            {
-              "datasource": {
-                "type": "influxdb",
-                "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
-              },
-              "hide": true,
-              "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"best\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"best\")",
-              "refId": "Best"
-            },
-            {
-              "datasource": {
-                "type": "influxdb",
-                "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
-              },
-              "hide": false,
-              "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"worst\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"worst\")",
-              "refId": "Worst"
-            }
-          ],
-          "title": "Worst",
-          "type": "timeseries"
-        },
-        {
-          "datasource": {
-            "type": "influxdb",
-            "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
-          },
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "fixedColor": "#795dff",
-                "mode": "fixed"
-              },
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green"
-                  }
-                ]
-              },
-              "unit": "ms"
-            },
-            "overrides": [
-              {
-                "matcher": {
-                  "id": "byRegexp",
-                  "options": "/avg/"
-                },
-                "properties": [
-                  {
-                    "id": "color",
-                    "value": {
-                      "fixedColor": "#5dffb0",
-                      "mode": "fixed"
-                    }
-                  }
-                ]
-              },
-              {
-                "matcher": {
-                  "id": "byRegexp",
-                  "options": "/best/"
-                },
-                "properties": [
-                  {
-                    "id": "color",
-                    "value": {
-                      "fixedColor": "#ffa65d",
-                      "mode": "fixed"
-                    }
-                  }
-                ]
-              },
-              {
-                "matcher": {
-                  "id": "byRegexp",
-                  "options": "/worst/"
-                },
-                "properties": [
-                  {
-                    "id": "color",
-                    "value": {
-                      "fixedColor": "#5caaff",
-                      "mode": "fixed"
-                    }
-                  }
-                ]
-              }
-            ]
-          },
-          "gridPos": {
-            "h": 8,
-            "w": 4,
-            "x": 20,
-            "y": 9
-          },
-          "id": 29,
-          "options": {
-            "colorMode": "value",
-            "graphMode": "none",
-            "justifyMode": "auto",
-            "orientation": "auto",
-            "reduceOptions": {
-              "calcs": [
-                "lastNotNull"
-              ],
-              "fields": "",
-              "values": false
-            },
-            "textMode": "auto"
-          },
-          "pluginVersion": "10.0.3",
-          "targets": [
-            {
-              "datasource": {
-                "type": "influxdb",
-                "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
-              },
-              "hide": true,
-              "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"last\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"last\")",
-              "refId": "Last"
-            },
-            {
-              "datasource": {
-                "type": "influxdb",
-                "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
-              },
-              "hide": true,
-              "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"avg\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"avg\")",
-              "refId": "Avg"
-            },
-            {
-              "datasource": {
-                "type": "influxdb",
-                "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
-              },
-              "hide": true,
-              "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"best\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"best\")",
-              "refId": "Best"
-            },
-            {
-              "datasource": {
-                "type": "influxdb",
-                "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
-              },
-              "hide": false,
-              "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"worst\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"worst\")",
-              "refId": "Worst"
-            }
-          ],
-          "title": "Worst",
-          "type": "stat"
-        }
-      ],
+      "panels": [],
       "repeat": "target",
       "repeatDirection": "h",
       "title": "$target",
       "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "#795dff",
+            "mode": "fixed"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineStyle": {
+              "fill": "solid"
+            },
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "ms"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/avg/"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#5dffb0",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/best/"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#ffa65d",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/worst/"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#5caaff",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 1
+      },
+      "id": 22,
+      "options": {
+        "legend": {
+          "calcs": [
+            "min",
+            "max",
+            "mean",
+            "lastNotNull"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "10.0.3",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
+          },
+          "hide": false,
+          "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"last\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"last\")",
+          "refId": "Last"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
+          },
+          "hide": true,
+          "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"avg\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"avg\")",
+          "refId": "Avg"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
+          },
+          "hide": true,
+          "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"best\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"best\")",
+          "refId": "Best"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
+          },
+          "hide": true,
+          "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"worst\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"worst\")",
+          "refId": "Worst"
+        }
+      ],
+      "title": "Last",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "#795dff",
+            "mode": "fixed"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "ms"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/avg/"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#5dffb0",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/best/"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#ffa65d",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/worst/"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#5caaff",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 4,
+        "x": 8,
+        "y": 1
+      },
+      "id": 23,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "pluginVersion": "10.0.3",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
+          },
+          "hide": false,
+          "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"last\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"last\")",
+          "refId": "Last"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
+          },
+          "hide": true,
+          "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"avg\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"avg\")",
+          "refId": "Avg"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
+          },
+          "hide": true,
+          "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"best\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"best\")",
+          "refId": "Best"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
+          },
+          "hide": true,
+          "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"worst\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"worst\")",
+          "refId": "Worst"
+        }
+      ],
+      "title": "Last",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "#795dff",
+            "mode": "fixed"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineStyle": {
+              "fill": "solid"
+            },
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "ms"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/avg/"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#5dffb0",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/best/"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#ffa65d",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/worst/"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#5caaff",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 12,
+        "y": 1
+      },
+      "id": 24,
+      "options": {
+        "legend": {
+          "calcs": [
+            "min",
+            "max",
+            "mean",
+            "lastNotNull"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "10.0.3",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
+          },
+          "hide": true,
+          "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"last\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"last\")",
+          "refId": "Last"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
+          },
+          "hide": false,
+          "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"avg\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"avg\")",
+          "refId": "Avg"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
+          },
+          "hide": true,
+          "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"best\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"best\")",
+          "refId": "Best"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
+          },
+          "hide": true,
+          "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"worst\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"worst\")",
+          "refId": "Worst"
+        }
+      ],
+      "title": "Avg",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "#795dff",
+            "mode": "fixed"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "ms"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/avg/"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#5dffb0",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/best/"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#ffa65d",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/worst/"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#5caaff",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 4,
+        "x": 20,
+        "y": 1
+      },
+      "id": 25,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "pluginVersion": "10.0.3",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
+          },
+          "hide": true,
+          "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"last\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"last\")",
+          "refId": "Last"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
+          },
+          "hide": false,
+          "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"avg\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"avg\")",
+          "refId": "Avg"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
+          },
+          "hide": true,
+          "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"best\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"best\")",
+          "refId": "Best"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
+          },
+          "hide": true,
+          "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"worst\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"worst\")",
+          "refId": "Worst"
+        }
+      ],
+      "title": "Avg",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "#795dff",
+            "mode": "fixed"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineStyle": {
+              "fill": "solid"
+            },
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "ms"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/avg/"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#5dffb0",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/best/"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#ffa65d",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/worst/"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#5caaff",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 9
+      },
+      "id": 26,
+      "options": {
+        "legend": {
+          "calcs": [
+            "min",
+            "max",
+            "mean",
+            "lastNotNull"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "10.0.3",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
+          },
+          "hide": true,
+          "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"last\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"last\")",
+          "refId": "Last"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
+          },
+          "hide": true,
+          "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"avg\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"avg\")",
+          "refId": "Avg"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
+          },
+          "hide": false,
+          "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"best\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"best\")",
+          "refId": "Best"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
+          },
+          "hide": true,
+          "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"worst\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"worst\")",
+          "refId": "Worst"
+        }
+      ],
+      "title": "Best",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "#795dff",
+            "mode": "fixed"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "ms"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/avg/"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#5dffb0",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/best/"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#ffa65d",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/worst/"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#5caaff",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 4,
+        "x": 8,
+        "y": 9
+      },
+      "id": 27,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "pluginVersion": "10.0.3",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
+          },
+          "hide": true,
+          "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"last\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"last\")",
+          "refId": "Last"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
+          },
+          "hide": true,
+          "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"avg\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"avg\")",
+          "refId": "Avg"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
+          },
+          "hide": false,
+          "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"best\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"best\")",
+          "refId": "Best"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
+          },
+          "hide": true,
+          "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"worst\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"worst\")",
+          "refId": "Worst"
+        }
+      ],
+      "title": "Best",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "#795dff",
+            "mode": "fixed"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineStyle": {
+              "fill": "solid"
+            },
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "ms"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/avg/"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#5dffb0",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/best/"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#ffa65d",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/worst/"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#5caaff",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 12,
+        "y": 9
+      },
+      "id": 28,
+      "options": {
+        "legend": {
+          "calcs": [
+            "min",
+            "max",
+            "mean",
+            "lastNotNull"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "10.0.3",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
+          },
+          "hide": true,
+          "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"last\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"last\")",
+          "refId": "Last"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
+          },
+          "hide": true,
+          "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"avg\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"avg\")",
+          "refId": "Avg"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
+          },
+          "hide": true,
+          "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"best\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"best\")",
+          "refId": "Best"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
+          },
+          "hide": false,
+          "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"worst\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"worst\")",
+          "refId": "Worst"
+        }
+      ],
+      "title": "Worst",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "#795dff",
+            "mode": "fixed"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "ms"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/avg/"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#5dffb0",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/best/"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#ffa65d",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/worst/"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#5caaff",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 4,
+        "x": 20,
+        "y": 9
+      },
+      "id": 29,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "pluginVersion": "10.0.3",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
+          },
+          "hide": true,
+          "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"last\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"last\")",
+          "refId": "Last"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
+          },
+          "hide": true,
+          "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"avg\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"avg\")",
+          "refId": "Avg"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
+          },
+          "hide": true,
+          "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"best\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"best\")",
+          "refId": "Best"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
+          },
+          "hide": false,
+          "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"worst\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"worst\")",
+          "refId": "Worst"
+        }
+      ],
+      "title": "Worst",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "#795dff",
+            "mode": "fixed"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 25,
+            "gradientMode": "opacity",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineStyle": {
+              "fill": "solid"
+            },
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "ms"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/avg/"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#5dffb0",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/best/"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#ffa65d",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/worst/"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#5caaff",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 20,
+        "x": 0,
+        "y": 17
+      },
+      "id": 58,
+      "options": {
+        "legend": {
+          "calcs": [
+            "min",
+            "max",
+            "mean",
+            "lastNotNull"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "10.0.3",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
+          },
+          "hide": false,
+          "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"dig\")\n  |> filter(fn: (r) => r[\"_field\"] == \"query_time\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"query_time\")",
+          "refId": "Query Time"
+        }
+      ],
+      "title": "DNS Query Time",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "#795dff",
+            "mode": "fixed"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "ms"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/avg/"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#5dffb0",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/best/"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#ffa65d",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/worst/"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#5caaff",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 4,
+        "x": 20,
+        "y": 17
+      },
+      "id": 59,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "pluginVersion": "10.0.3",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
+          },
+          "hide": false,
+          "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"dig\")\n  |> filter(fn: (r) => r[\"_field\"] == \"query_time\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"query_time\")",
+          "refId": "Query Time"
+        }
+      ],
+      "title": "DNS Query Time",
+      "type": "stat"
     }
   ],
   "refresh": "",
@@ -1255,18 +1512,12 @@
     "list": [
       {
         "current": {
-          "selected": false,
+          "selected": true,
           "text": [
-            "1.1.1.1",
-            "1.0.0.1",
-            "2606:4700:4700::1001",
-            "2606:4700:4700::1111"
+            "All"
           ],
           "value": [
-            "1.1.1.1",
-            "1.0.0.1",
-            "2606:4700:4700::1001",
-            "2606:4700:4700::1111"
+            "$__all"
           ]
         },
         "datasource": {
@@ -1297,6 +1548,6 @@
   "timezone": "",
   "title": "Latency Monitor",
   "uid": "b662ccf6-8b7c-49e0-be2a-fdc3af653239",
-  "version": 8,
+  "version": 10,
   "weekStart": ""
 }

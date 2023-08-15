@@ -8,6 +8,14 @@ services:
       - "8080:8080"
     depends_on:
       - mtr-redis
+    environment:
+      - MTR_TARGETS=1.1.1.1,1.0.0.1,2606:4700:4700::1111,2606:4700:4700::1001
+      - REDIS_HOST=mtr-redis
+      - REDIS_PORT=6379
+      - INFLUXDB_V2_URL=http://mtr-influx:8086
+      - INFLUXDB_V2_ORG=mtr
+      - INFLUXDB_V2_TOKEN=change-me
+      - INFLUXDB_BUCKET=mtr
 
   mtr-worker:
     image: ghcr.io/turbocheetah/mtr-probe:master
@@ -15,12 +23,42 @@ services:
     command: celery -A mtr_probe.mtr_probe.celery worker -B --loglevel=info
     depends_on:
       - mtr-redis
+    environment:
+      - MTR_TARGETS=1.1.1.1,1.0.0.1,2606:4700:4700::1111,2606:4700:4700::1001
+      - REDIS_HOST=mtr-redis
+      - REDIS_PORT=6379
+      - INFLUXDB_V2_URL=http://mtr-influx:8086
+      - INFLUXDB_V2_ORG=mtr
+      - INFLUXDB_V2_TOKEN=change-me
+      - INFLUXDB_BUCKET=mtr
 
   mtr-redis:
+    image: redis:alpine
     container_name: mtr-redis
-    image: "redis:alpine"
     ports:
       - "6379:6379"
+    volumes:
+      - redisData:/data
+
+  mtr-influx:
+    image: influxdb:2.7-alpine
+    container_name: mtr-influx
+    ports:
+      - "8086:8086"
+    environment:
+      - DOCKER_INFLUXDB_INIT_MODE=setup
+      - DOCKER_INFLUXDB_INIT_USERNAME=mtr
+      - DOCKER_INFLUXDB_INIT_PASSWORD=change-me
+      - DOCKER_INFLUXDB_INIT_ORG=mtr
+      - DOCKER_INFLUXDB_INIT_BUCKET=mtr
+      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=change-me
+    volumes:
+      - influxdbData:/var/lib/influxdb2
+
+volumes:
+  redisData:
+  influxdbData:
+
 
 networks:
   default:

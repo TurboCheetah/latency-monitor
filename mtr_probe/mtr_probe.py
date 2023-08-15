@@ -1,8 +1,11 @@
 import subprocess
+from os import environ
 
 from celery import Celery
 from celery.schedules import crontab
 from flask import Flask, jsonify, render_template
+from influxdb_client import InfluxDBClient, Point
+from influxdb_client.client.write_api import SYNCHRONOUS
 from redis import Redis
 
 app = Flask(__name__)
@@ -11,7 +14,7 @@ app.config["CELERY_CONFIG"] = {
     "result_backend": "redis://mtr-redis:6379/0",
     "broker_connection_retry_on_startup": True,
     "beat_schedule": {
-        "run-mtr-every-5-minutse": {
+        "run-mtr-every-5-minutes": {
             "task": "mtr_probe.mtr_probe.run_mtr",
             "schedule": crontab(minute="*/5"),
         },
@@ -21,9 +24,13 @@ app.config["CELERY_CONFIG"] = {
 celery = Celery(app.name)
 celery.conf.update(app.config["CELERY_CONFIG"])
 
-redis = Redis(host="mtr-redis", port=6379, db=0)
+redis = Redis(host=environ["REDIS_HOST"], port=int(environ["REDIS_PORT"]))
 
-targets = ["1.1.1.1", "1.0.0.1", "2606:4700:4700::1111", "2606:4700:4700::1001"]
+influx = InfluxDBClient.from_env_properties()
+influx_write_api = influx.write_api(write_options=SYNCHRONOUS)
+influx_query_api = influx.query_api()
+
+targets = environ["MTR_TARGETS"].split(",")
 
 
 @celery.task
@@ -38,7 +45,22 @@ def run_mtr():
         result = subprocess.run(cmd, capture_output=True, text=True)
         redis.set(target, result.stdout)
 
+        p = Point("mtr").tag("target", target).field("result", result.stdout)
+        influx_write_api.write(
+            bucket=environ["INFLUXDB_BUCKET"], org=environ["INFLUXDB_V2_ORG"], record=p
+        )
+
         print(f"Ran MTR for {target}")
+
+
+@app.route("/")
+def index():
+    results = {
+        target: (res.decode("utf-8") if res else "")
+        for target, res in zip(targets, redis.mget(targets))
+    }
+
+    return render_template("index.html", targets=targets, results=results), 200
 
 
 @app.route("/json")
@@ -54,16 +76,6 @@ def json():
         "results": results,
     }
     return jsonify(response)
-
-
-@app.route("/")
-def index():
-    results = {
-        target: (res.decode("utf-8") if res else "")
-        for target, res in zip(targets, redis.mget(targets))
-    }
-
-    return render_template("index.html", targets=targets, results=results), 200
 
 
 @app.route("/trigger-mtr")

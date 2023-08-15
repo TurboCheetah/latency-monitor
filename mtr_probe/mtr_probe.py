@@ -8,6 +8,8 @@ from influxdb_client import InfluxDBClient, Point
 from influxdb_client.client.write_api import SYNCHRONOUS
 from redis import Redis
 
+from .utils import parse_mtr
+
 app = Flask(__name__)
 app.config["CELERY_CONFIG"] = {
     "broker_url": "redis://mtr-redis:6379/0",
@@ -45,7 +47,21 @@ def run_mtr():
         result = subprocess.run(cmd, capture_output=True, text=True)
         redis.set(target, result.stdout)
 
-        p = Point("mtr").tag("target", target).field("result", result.stdout)
+        parsed_output = parse_mtr(result.stdout, target)
+
+        p = (
+            Point("mtr")
+            .tag("target", target)
+            .field("loss", parsed_output["loss"])
+            .field("snt", parsed_output["snt"])
+            .field("last", parsed_output["last"])
+            .field("avg", parsed_output["avg"])
+            .field("best", parsed_output["best"])
+            .field("worst", parsed_output["worst"])
+            .field("stdev", parsed_output["stdev"])
+            .field("raw", result.stdout)
+        )
+
         influx_write_api.write(
             bucket=environ["INFLUXDB_BUCKET"], org=environ["INFLUXDB_V2_ORG"], record=p
         )

@@ -1,56 +1,56 @@
 version: '3.8'
 
 services:
-  mtr-web:
-    image: ghcr.io/turbocheetah/mtr-probe:master
-    container_name: mtr-web
+  web:
+    image: ghcr.io/turbocheetah/latency-monitor:master
+    container_name: latency-monitor-web
     ports:
       - "8080:8080"
     depends_on:
-      - mtr-redis
+      - redis
     environment:
-      - MTR_TARGETS=1.1.1.1,1.0.0.1,2606:4700:4700::1111,2606:4700:4700::1001
-      - REDIS_HOST=mtr-redis
+      - TARGETS=1.1.1.1,1.0.0.1,2606:4700:4700::1111,2606:4700:4700::1001
+      - REDIS_HOST=redis
       - REDIS_PORT=6379
-      - INFLUXDB_V2_URL=http://mtr-influx:8086
-      - INFLUXDB_V2_ORG=mtr
+      - INFLUXDB_V2_URL=http://influx:8086
+      - INFLUXDB_V2_ORG=latency-monitor
       - INFLUXDB_V2_TOKEN=change-me
-      - INFLUXDB_BUCKET=mtr
+      - INFLUXDB_BUCKET=latency-monitor
 
-  mtr-worker:
-    image: ghcr.io/turbocheetah/mtr-probe:master
-    container_name: mtr-worker
-    command: celery -A mtr_probe.mtr_probe.celery worker -B --loglevel=info
+  worker:
+    image: ghcr.io/turbocheetah/latency-monitor:master
+    container_name: latency-monitor-worker
+    command: celery -A latency_monitor.latency_monitor.celery worker -B --loglevel=info
     depends_on:
-      - mtr-redis
+      - redis
     environment:
-      - MTR_TARGETS=1.1.1.1,1.0.0.1,2606:4700:4700::1111,2606:4700:4700::1001
-      - REDIS_HOST=mtr-redis
+      - TARGETS=1.1.1.1,1.0.0.1,2606:4700:4700::1111,2606:4700:4700::1001
+      - REDIS_HOST=redis
       - REDIS_PORT=6379
-      - INFLUXDB_V2_URL=http://mtr-influx:8086
-      - INFLUXDB_V2_ORG=mtr
+      - INFLUXDB_V2_URL=http://influx:8086
+      - INFLUXDB_V2_ORG=latency-monitor
       - INFLUXDB_V2_TOKEN=change-me
-      - INFLUXDB_BUCKET=mtr
+      - INFLUXDB_BUCKET=latency-monitor
 
-  mtr-redis:
+  redis:
     image: redis:alpine
-    container_name: mtr-redis
+    container_name: latency-monitor-redis
     ports:
       - "6379:6379"
     volumes:
       - redisData:/data
 
-  mtr-influx:
+  influx:
     image: influxdb:2.7-alpine
-    container_name: mtr-influx
+    container_name: latency-monitor-influx
     ports:
       - "8086:8086"
     environment:
       - DOCKER_INFLUXDB_INIT_MODE=setup
-      - DOCKER_INFLUXDB_INIT_USERNAME=mtr
+      - DOCKER_INFLUXDB_INIT_USERNAME=latency-monitor
       - DOCKER_INFLUXDB_INIT_PASSWORD=change-me
-      - DOCKER_INFLUXDB_INIT_ORG=mtr
-      - DOCKER_INFLUXDB_INIT_BUCKET=mtr
+      - DOCKER_INFLUXDB_INIT_ORG=latency-monitor
+      - DOCKER_INFLUXDB_INIT_BUCKET=latency-monitor
       - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=change-me
     volumes:
       - influxdbData:/var/lib/influxdb2
@@ -62,5 +62,5 @@ volumes:
 
 networks:
   default:
-    name: mtr-probe
+    name: latency-monitor
     driver: bridge

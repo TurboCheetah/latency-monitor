@@ -1,7 +1,7 @@
 [tool.poetry]
-name = "mtr-probe"
-version = "1.0.0"
-description = "simple HTTP server that displays MTR results that update every 15m"
+name = "latency-monitor"
+version = "1.1.0"
+description = "logs latency to/of the specified targets and stores them in influxdb"
 authors = ["Turbo <dev@turbo.ooo>"]
 license = "GPLv3"
 readme = "README.md"

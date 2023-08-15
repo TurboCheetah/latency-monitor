@@ -15,4 +15,4 @@ COPY . .
 
 EXPOSE 8080
 
-CMD ["gunicorn", "mtr_probe.mtr_probe:app", "-w", "4", "-b", "0.0.0.0:8080"]
+CMD ["gunicorn", "latency_monitor.latency_monitor:flask", "-w", "4", "-b", "0.0.0.0:8080"]

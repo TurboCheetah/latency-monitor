@@ -1,3 +1,3 @@
-# mtr-probe
+# latency-monitor
 
-I got annoyed with CloudFlare having awful routing so I built this to send to their engineers
+I got annoyed with CloudFlare having awful latency to me so I built this

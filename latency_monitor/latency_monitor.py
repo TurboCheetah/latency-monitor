@@ -9,7 +9,7 @@ from redis import Redis
 
 
 class App:
-    def __init__(self):
+    def __init__(self) -> None:
         self.flask = Flask(__name__)
 
         self.flask.config["CELERY_CONFIG"] = {

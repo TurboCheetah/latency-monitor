@@ -22,7 +22,7 @@ def mtr(target: str) -> dict:
 
 
 @app.celery.task
-def run_mtr():
+def run_mtr() -> None:
     """Run the MTR command and update the global variable with the results."""
     with ThreadPoolExecutor() as executor:
         results = list(executor.map(mtr, app.targets))

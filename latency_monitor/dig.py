@@ -19,7 +19,7 @@ def dig(target: str) -> dict:
 
 
 @app.celery.task
-def run_dig():
+def run_dig() -> None:
     """Run the dig command and update the global variable with the results."""
     with ThreadPoolExecutor() as executor:
         results = list(executor.map(dig, app.targets))

@@ -1,10 +1,10 @@
-from flask import jsonify, render_template
+from flask import Response, jsonify, render_template
 
 from .latency_monitor import app
 
 
 @app.flask.route("/")
-def index():
+def index() -> tuple[str, int]:
     mtr_results = {
         target: (res.decode("utf-8") if res else "")
         for target, res in zip(
@@ -31,7 +31,7 @@ def index():
 
 
 @app.flask.route("/json")
-def json():
+def json() -> tuple[Response, int]:
     mtr_results = {
         target: (res.decode("utf-8") if res else "")
         for target, res in zip(
@@ -58,16 +58,16 @@ def json():
             "results": dig_results,
         },
     }
-    return jsonify(response)
+    return jsonify(response), 200
 
 
 @app.flask.route("/trigger-mtr")
-def trigger_mtr():
+def trigger_mtr() -> tuple[Response, int]:
     result = app.celery.send_task("latency_monitor.mtr.run_mtr")
     return jsonify({"task_id": result.id}), 202
 
 
 @app.flask.route("/trigger-dig")
-def trigger_dig():
+def trigger_dig() -> tuple[Response, int]:
     result = app.celery.send_task("latency_monitor.dig.run_dig")
     return jsonify({"task_id": result.id}), 202

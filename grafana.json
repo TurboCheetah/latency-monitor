@@ -40,7 +40,7 @@
     {
       "datasource": {
         "type": "influxdb",
-        "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
+        "uid": "${host}"
       },
       "fieldConfig": {
         "defaults": {
@@ -170,7 +170,7 @@
         {
           "datasource": {
             "type": "influxdb",
-            "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
+            "uid": "${host}"
           },
           "hide": false,
           "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"last\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"last\")",
@@ -179,7 +179,7 @@
         {
           "datasource": {
             "type": "influxdb",
-            "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
+            "uid": "${host}"
           },
           "hide": true,
           "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"avg\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"avg\")",
@@ -188,7 +188,7 @@
         {
           "datasource": {
             "type": "influxdb",
-            "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
+            "uid": "${host}"
           },
           "hide": true,
           "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"best\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"best\")",
@@ -197,7 +197,7 @@
         {
           "datasource": {
             "type": "influxdb",
-            "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
+            "uid": "${host}"
           },
           "hide": true,
           "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"worst\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"worst\")",
@@ -210,7 +210,7 @@
     {
       "datasource": {
         "type": "influxdb",
-        "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
+        "uid": "${host}"
       },
       "fieldConfig": {
         "defaults": {
@@ -304,7 +304,7 @@
         {
           "datasource": {
             "type": "influxdb",
-            "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
+            "uid": "${host}"
           },
           "hide": false,
           "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"last\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"last\")",
@@ -313,7 +313,7 @@
         {
           "datasource": {
             "type": "influxdb",
-            "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
+            "uid": "${host}"
           },
           "hide": true,
           "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"avg\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"avg\")",
@@ -322,7 +322,7 @@
         {
           "datasource": {
             "type": "influxdb",
-            "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
+            "uid": "${host}"
           },
           "hide": true,
           "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"best\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"best\")",
@@ -331,7 +331,7 @@
         {
           "datasource": {
             "type": "influxdb",
-            "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
+            "uid": "${host}"
           },
           "hide": true,
           "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"worst\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"worst\")",
@@ -344,7 +344,7 @@
     {
       "datasource": {
         "type": "influxdb",
-        "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
+        "uid": "${host}"
       },
       "fieldConfig": {
         "defaults": {
@@ -474,7 +474,7 @@
         {
           "datasource": {
             "type": "influxdb",
-            "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
+            "uid": "${host}"
           },
           "hide": true,
           "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"last\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"last\")",
@@ -483,7 +483,7 @@
         {
           "datasource": {
             "type": "influxdb",
-            "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
+            "uid": "${host}"
           },
           "hide": false,
           "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"avg\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"avg\")",
@@ -492,7 +492,7 @@
         {
           "datasource": {
             "type": "influxdb",
-            "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
+            "uid": "${host}"
           },
           "hide": true,
           "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"best\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"best\")",
@@ -501,7 +501,7 @@
         {
           "datasource": {
             "type": "influxdb",
-            "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
+            "uid": "${host}"
           },
           "hide": true,
           "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"worst\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"worst\")",
@@ -514,7 +514,7 @@
     {
       "datasource": {
         "type": "influxdb",
-        "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
+        "uid": "${host}"
       },
       "fieldConfig": {
         "defaults": {
@@ -608,7 +608,7 @@
         {
           "datasource": {
             "type": "influxdb",
-            "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
+            "uid": "${host}"
           },
           "hide": true,
           "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"last\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"last\")",
@@ -617,7 +617,7 @@
         {
           "datasource": {
             "type": "influxdb",
-            "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
+            "uid": "${host}"
           },
           "hide": false,
           "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"avg\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"avg\")",
@@ -626,7 +626,7 @@
         {
           "datasource": {
             "type": "influxdb",
-            "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
+            "uid": "${host}"
           },
           "hide": true,
           "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"best\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"best\")",
@@ -635,7 +635,7 @@
         {
           "datasource": {
             "type": "influxdb",
-            "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
+            "uid": "${host}"
           },
           "hide": true,
           "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"worst\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"worst\")",
@@ -648,7 +648,7 @@
     {
       "datasource": {
         "type": "influxdb",
-        "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
+        "uid": "${host}"
       },
       "fieldConfig": {
         "defaults": {
@@ -778,7 +778,7 @@
         {
           "datasource": {
             "type": "influxdb",
-            "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
+            "uid": "${host}"
           },
           "hide": true,
           "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"last\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"last\")",
@@ -787,7 +787,7 @@
         {
           "datasource": {
             "type": "influxdb",
-            "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
+            "uid": "${host}"
           },
           "hide": true,
           "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"avg\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"avg\")",
@@ -796,7 +796,7 @@
         {
           "datasource": {
             "type": "influxdb",
-            "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
+            "uid": "${host}"
           },
           "hide": false,
           "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"best\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"best\")",
@@ -805,7 +805,7 @@
         {
           "datasource": {
             "type": "influxdb",
-            "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
+            "uid": "${host}"
           },
           "hide": true,
           "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"worst\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"worst\")",
@@ -818,7 +818,7 @@
     {
       "datasource": {
         "type": "influxdb",
-        "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
+        "uid": "${host}"
       },
       "fieldConfig": {
         "defaults": {
@@ -912,7 +912,7 @@
         {
           "datasource": {
             "type": "influxdb",
-            "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
+            "uid": "${host}"
           },
           "hide": true,
           "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"last\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"last\")",
@@ -921,7 +921,7 @@
         {
           "datasource": {
             "type": "influxdb",
-            "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
+            "uid": "${host}"
           },
           "hide": true,
           "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"avg\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"avg\")",
@@ -930,7 +930,7 @@
         {
           "datasource": {
             "type": "influxdb",
-            "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
+            "uid": "${host}"
           },
           "hide": false,
           "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"best\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"best\")",
@@ -939,7 +939,7 @@
         {
           "datasource": {
             "type": "influxdb",
-            "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
+            "uid": "${host}"
           },
           "hide": true,
           "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"worst\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"worst\")",
@@ -952,7 +952,7 @@
     {
       "datasource": {
         "type": "influxdb",
-        "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
+        "uid": "${host}"
       },
       "fieldConfig": {
         "defaults": {
@@ -1082,7 +1082,7 @@
         {
           "datasource": {
             "type": "influxdb",
-            "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
+            "uid": "${host}"
           },
           "hide": true,
           "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"last\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"last\")",
@@ -1091,7 +1091,7 @@
         {
           "datasource": {
             "type": "influxdb",
-            "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
+            "uid": "${host}"
           },
           "hide": true,
           "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"avg\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"avg\")",
@@ -1100,7 +1100,7 @@
         {
           "datasource": {
             "type": "influxdb",
-            "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
+            "uid": "${host}"
           },
           "hide": true,
           "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"best\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"best\")",
@@ -1109,7 +1109,7 @@
         {
           "datasource": {
             "type": "influxdb",
-            "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
+            "uid": "${host}"
           },
           "hide": false,
           "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"worst\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"worst\")",
@@ -1122,7 +1122,7 @@
     {
       "datasource": {
         "type": "influxdb",
-        "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
+        "uid": "${host}"
       },
       "fieldConfig": {
         "defaults": {
@@ -1216,7 +1216,7 @@
         {
           "datasource": {
             "type": "influxdb",
-            "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
+            "uid": "${host}"
           },
           "hide": true,
           "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"last\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"last\")",
@@ -1225,7 +1225,7 @@
         {
           "datasource": {
             "type": "influxdb",
-            "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
+            "uid": "${host}"
           },
           "hide": true,
           "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"avg\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"avg\")",
@@ -1234,7 +1234,7 @@
         {
           "datasource": {
             "type": "influxdb",
-            "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
+            "uid": "${host}"
           },
           "hide": true,
           "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"best\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"best\")",
@@ -1243,7 +1243,7 @@
         {
           "datasource": {
             "type": "influxdb",
-            "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
+            "uid": "${host}"
           },
           "hide": false,
           "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"mtr\")\n  |> filter(fn: (r) => r[\"_field\"] == \"worst\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"worst\")",
@@ -1256,7 +1256,7 @@
     {
       "datasource": {
         "type": "influxdb",
-        "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
+        "uid": "${host}"
       },
       "fieldConfig": {
         "defaults": {
@@ -1386,7 +1386,7 @@
         {
           "datasource": {
             "type": "influxdb",
-            "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
+            "uid": "${host}"
           },
           "hide": false,
           "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"dig\")\n  |> filter(fn: (r) => r[\"_field\"] == \"query_time\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"query_time\")",
@@ -1399,7 +1399,7 @@
     {
       "datasource": {
         "type": "influxdb",
-        "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
+        "uid": "${host}"
       },
       "fieldConfig": {
         "defaults": {
@@ -1493,7 +1493,7 @@
         {
           "datasource": {
             "type": "influxdb",
-            "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
+            "uid": "${host}"
           },
           "hide": false,
           "query": "from(bucket: \"latency-monitor\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r[\"_measurement\"] == \"dig\")\n  |> filter(fn: (r) => r[\"_field\"] == \"query_time\")\n  |> filter(fn: (r) => r[\"target\"] == \"${target}\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> yield(name: \"query_time\")",
@@ -1512,17 +1512,23 @@
     "list": [
       {
         "current": {
-          "selected": true,
+          "selected": false,
           "text": [
-            "All"
+            "1.1.1.1",
+            "1.0.0.1",
+            "2606:4700:4700::1001",
+            "2606:4700:4700::1111"
           ],
           "value": [
-            "$__all"
+            "1.1.1.1",
+            "1.0.0.1",
+            "2606:4700:4700::1001",
+            "2606:4700:4700::1111"
           ]
         },
         "datasource": {
           "type": "influxdb",
-          "uid": "dca1bd56-aa08-4bc4-b974-add0e417d500"
+          "uid": "${host}"
         },
         "definition": "import \"influxdata/influxdb/v1\"\nv1.tagValues(\n    bucket: v.bucket,\n    tag: \"target\",\n    predicate: (r) => true,\n    start: -1d\n)",
         "hide": 0,
@@ -1537,6 +1543,24 @@
         "skipUrlSync": false,
         "sort": 0,
         "type": "query"
+      },
+      {
+        "current": {
+          "selected": false,
+          "text": "InfluxDB - Latency - Pocky",
+          "value": "InfluxDB - Latency - Pocky"
+        },
+        "hide": 0,
+        "includeAll": false,
+        "multi": false,
+        "name": "host",
+        "options": [],
+        "query": "influxdb",
+        "queryValue": "",
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "type": "datasource"
       }
     ]
   },
@@ -1548,6 +1572,6 @@
   "timezone": "",
   "title": "Latency Monitor",
   "uid": "b662ccf6-8b7c-49e0-be2a-fdc3af653239",
-  "version": 10,
+  "version": 11,
   "weekStart": ""
 }

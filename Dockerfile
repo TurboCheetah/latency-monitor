@@ -5,7 +5,7 @@ WORKDIR /app
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
-RUN apk --no-cache add mtr=0.95-r2 bind-tools=9.18.16-r0 && \
+RUN apk --no-cache add mtr bind-tools && \
   pip install --no-cache-dir poetry==1.5.1
 
 COPY pyproject.toml poetry.lock ./

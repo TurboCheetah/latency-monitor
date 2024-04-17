@@ -233,13 +233,13 @@ tornado = ["tornado (>=0.2)"]
 
 [[package]]
 name = "influxdb-client"
-version = "1.41.0"
+version = "1.42.0"
 description = "InfluxDB 2.0 Python client library"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "influxdb_client-1.41.0-py3-none-any.whl", hash = "sha256:420d7c5b7ed0f778de0eac923aded3ea3a4eb6b247e3fbb7a187e0a577a5a3be"},
-    {file = "influxdb_client-1.41.0.tar.gz", hash = "sha256:4b85bad3991f3de24818366c87c8868a64917fea2d21bbcc2b579fbe5d904990"},
+    {file = "influxdb_client-1.42.0-py3-none-any.whl", hash = "sha256:0161b963f221d5c1769202f41ff55f5d79e00e6dc24e2a0729c82a1e131956ee"},
+    {file = "influxdb_client-1.42.0.tar.gz", hash = "sha256:f5e877feb671eda41e2b5c98ed1dc8ec3327fd8991360dc614822119cda06491"},
 ]
 
 [package.dependencies]

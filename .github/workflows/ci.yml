@@ -24,7 +24,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create Release
-        uses: softprops/action-gh-release@9a28f2423fd7ba2781181bb13e8aba228027c4e9
+        uses: softprops/action-gh-release@79721680dfc87fb0f44dfe65df68961056d55c38
         with:
           body: ${{steps.github_release.outputs.changelog}}
           prerelease: ${{ contains(github.ref, '-rc') || contains(github.ref, '-b') || contains(github.ref, '-a') }}

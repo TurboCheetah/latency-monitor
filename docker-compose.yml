@@ -44,7 +44,7 @@ services:
       - redisData:/data
 
   influx:
-    image: influxdb:2.7-alpine
+    image: influxdb:2.8-alpine
     container_name: latency-monitor-influx
     restart: unless-stopped
     ports:

@@ -22,7 +22,7 @@ services:
     image: ghcr.io/turbocheetah/latency-monitor:master
     container_name: latency-monitor-worker
     restart: unless-stopped
-    command: celery -A latency_monitor.latency_monitor.celery worker -B --loglevel=info
+    command: uv run celery -A latency_monitor.latency_monitor.celery worker -B --loglevel=info
     depends_on:
       - redis
     environment:

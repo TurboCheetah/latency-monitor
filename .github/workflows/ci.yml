@@ -2,12 +2,36 @@ name: CI
 
 on:
   push:
-    branches: [ "*" ]
-    tags: [ "*" ]
+    branches: ['*']
+    tags: ['*']
   pull_request:
-    branches: [ "*" ]
+    branches: ['*']
 
 jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+
+      - name: Install Poetry
+        uses: snok/install-poetry@76e04a911780d5b312d89783f7b1cd627778900a # v1
+        with:
+          virtualenvs-in-project: true
+
+      - name: Set up Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: "3.14"
+          allow-prereleases: true
+          cache: poetry
+
+      - name: Install dependencies
+        run: poetry install --no-interaction
+
+      - name: Run tests
+        run: poetry run pytest -v
+
   release:
     if: startsWith(github.ref, 'refs/tags/')
     runs-on: ubuntu-latest

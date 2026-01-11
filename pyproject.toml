@@ -7,7 +7,7 @@ license = "GPLv3"
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = "^3.14"
 Flask = "^3.0.0"
 celery = { extras = ["redis"], version = "^5.3.1" }
 redis = "^7.0.0"
@@ -18,3 +18,9 @@ influxdb-client = "^1.37.0"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[dependency-groups]
+dev = [
+    "pytest (>=9.0.2,<10.0.0)",
+    "pytest-mock (>=3.15.1,<4.0.0)"
+]

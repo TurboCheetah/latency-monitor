@@ -1,10 +1,10 @@
 # AGENTS.md
 
 ## Build & Run
-- **Install deps**: `poetry install`
-- **Run Flask dev**: `poetry run python -m latency_monitor.latency_monitor`
-- **Run Celery worker**: `poetry run celery -A latency_monitor.latency_monitor:celery worker`
-- **Run Celery beat**: `poetry run celery -A latency_monitor.latency_monitor:celery beat`
+- **Install deps**: `uv sync`
+- **Run Flask dev**: `uv run python -m latency_monitor.latency_monitor`
+- **Run Celery worker**: `uv run celery -A latency_monitor.latency_monitor:celery worker`
+- **Run Celery beat**: `uv run celery -A latency_monitor.latency_monitor:celery beat`
 - **Docker**: `docker compose up` (uses gunicorn on port 8080)
 
 ## Architecture
@@ -17,7 +17,7 @@
 - Utilities: `utils.py` — regex parsers for mtr/dig output
 
 ## Code Style
-- Python 3.14+, managed with Poetry
+- Python 3.14+, managed with uv
 - Type hints on function signatures (use `-> ReturnType`)
 - Imports: stdlib, then third-party, then local (relative imports within package)
 - Use `environ` directly for config; no .env file parsing

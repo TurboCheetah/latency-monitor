@@ -8,9 +8,25 @@ from influxdb_client.client.write_api import SYNCHRONOUS
 from redis import Redis
 
 
+def parse_crontab(cron_expr: str) -> crontab:
+    """Parse a cron expression (minute hour day_of_month month_of_year day_of_week) into a crontab."""
+    parts = cron_expr.split()
+    if len(parts) != 5:
+        raise ValueError(f"Invalid cron expression '{cron_expr}': expected 5 fields")
+    return crontab(
+        minute=parts[0],
+        hour=parts[1],
+        day_of_month=parts[2],
+        month_of_year=parts[3],
+        day_of_week=parts[4],
+    )
+
+
 class App:
     def __init__(self) -> None:
         self.flask = Flask(__name__)
+
+        schedule = parse_crontab(environ.get("SCHEDULE", "*/5 * * * *"))
 
         self.flask.config["CELERY_CONFIG"] = {
             "broker_url": f"redis://{environ['REDIS_HOST']}:{environ['REDIS_PORT']}/0",
@@ -19,11 +35,11 @@ class App:
             "beat_schedule": {
                 "mtr-task": {
                     "task": "latency_monitor.mtr.run_mtr",
-                    "schedule": crontab(minute="*/5"),
+                    "schedule": schedule,
                 },
                 "dig-task": {
                     "task": "latency_monitor.dig.run_dig",
-                    "schedule": crontab(minute="*/5"),
+                    "schedule": schedule,
                 },
             },
         }

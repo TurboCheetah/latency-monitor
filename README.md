@@ -6,7 +6,7 @@ A network latency monitoring tool that runs periodic MTR and DNS dig tests again
 
 ## Features
 
-- Scheduled MTR traces and DNS dig queries every 5 minutes via Celery Beat
+- Scheduled MTR traces and DNS dig queries via Celery Beat (configurable interval)
 - Time-series storage in InfluxDB for historical analysis
 - Web dashboard with JSON API endpoints
 - Docker deployment with Redis, InfluxDB, and Grafana support
@@ -26,6 +26,7 @@ Environment variables:
 | Variable | Description | Example |
 |----------|-------------|---------|
 | `TARGETS` | Comma-separated list of IPs/hostnames to monitor | `1.1.1.1,8.8.8.8` |
+| `SCHEDULE` | Cron expression for task schedule (5 fields) | `*/5 * * * *` |
 | `REDIS_HOST` | Redis hostname | `redis` |
 | `REDIS_PORT` | Redis port | `6379` |
 | `INFLUXDB_V2_URL` | InfluxDB URL | `http://influx:8086` |

@@ -11,6 +11,7 @@ services:
       - redis
     environment:
       - TARGETS=1.1.1.1,1.0.0.1,2606:4700:4700::1111,2606:4700:4700::1001
+      - SCHEDULE=*/5 * * * *
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - INFLUXDB_V2_URL=http://influx:8086
@@ -27,6 +28,7 @@ services:
       - redis
     environment:
       - TARGETS=1.1.1.1,1.0.0.1,2606:4700:4700::1111,2606:4700:4700::1001
+      - SCHEDULE=*/5 * * * *
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - INFLUXDB_V2_URL=http://influx:8086

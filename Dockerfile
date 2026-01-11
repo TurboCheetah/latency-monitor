@@ -2,8 +2,8 @@ FROM python:3.14-alpine
 
 WORKDIR /app
 
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
 
 RUN apk --no-cache add mtr bind-tools && \
   pip install --no-cache-dir poetry==1.5.1

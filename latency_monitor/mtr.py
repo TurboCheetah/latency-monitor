@@ -5,10 +5,12 @@ from os import environ
 from influxdb_client import Point
 
 from .latency_monitor import app
-from .utils import parse_mtr
+from .utils import parse_mtr, print_mtr_result, print_task_complete, print_task_start
 
 
 def mtr(target: str) -> dict:
+    print_task_start("MTR", target)
+
     cmd = ["mtr", "-rwznc", "10", target]
     if ":" in target:
         cmd = ["mtr", "-rwznc", "10", "-6", target]
@@ -16,7 +18,7 @@ def mtr(target: str) -> dict:
     result = subprocess.run(cmd, capture_output=True, text=True)
     parsed_output = parse_mtr(result.stdout, target)
 
-    print(f"Ran MTR for {target}")
+    print_mtr_result(target, parsed_output)
 
     return {"target": target, "stdout": result.stdout, "parsed_output": parsed_output}
 
@@ -26,6 +28,8 @@ def run_mtr() -> None:
     """Run the MTR command and update the global variable with the results."""
     with ThreadPoolExecutor() as executor:
         results = list(executor.map(mtr, app.targets))
+
+    print_task_complete("MTR", len(results))
 
     for res in results:
         target = res["target"]

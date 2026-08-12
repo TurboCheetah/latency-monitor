@@ -47,19 +47,19 @@ Environment variables:
 
 ```bash
 # Install dependencies
-poetry install
+uv sync
 
 # Run Flask dev server
-poetry run python -m latency_monitor.latency_monitor
+uv run python -m latency_monitor.latency_monitor
 
 # Run Celery worker (separate terminal)
-poetry run celery -A latency_monitor.latency_monitor:celery worker
+uv run celery -A latency_monitor.latency_monitor:celery worker
 
 # Run Celery beat scheduler (separate terminal)
-poetry run celery -A latency_monitor.latency_monitor:celery beat
+uv run celery -A latency_monitor.latency_monitor:celery beat
 
 # Run tests
-poetry run pytest
+uv run pytest
 ```
 
 ## Requirements

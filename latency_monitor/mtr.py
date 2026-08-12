@@ -4,18 +4,21 @@ from os import environ
 
 from influxdb_client import Point
 
-from .latency_monitor import app
+from .app_instance import get_app
 from .utils import parse_mtr, print_mtr_result, print_task_complete, print_task_start
+
+app = get_app()
 
 
 def mtr(target: str) -> dict:
+    """Run MTR for one target and return raw and parsed results."""
     print_task_start("MTR", target)
 
     cmd = ["mtr", "-rwznc", "10", target]
     if ":" in target:
         cmd = ["mtr", "-rwznc", "10", "-6", target]
 
-    result = subprocess.run(cmd, capture_output=True, text=True)
+    result = subprocess.run(cmd, capture_output=True, text=True, check=False)
     parsed_output = parse_mtr(result.stdout, target)
 
     print_mtr_result(target, parsed_output)
@@ -25,7 +28,7 @@ def mtr(target: str) -> dict:
 
 @app.celery.task
 def run_mtr() -> None:
-    """Run the MTR command and update the global variable with the results."""
+    """Run MTR for all configured targets and store the results."""
     with ThreadPoolExecutor() as executor:
         results = list(executor.map(mtr, app.targets))
 

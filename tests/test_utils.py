@@ -1,6 +1,6 @@
 import pytest
 
-from latency_monitor.utils import parse_mtr, parse_dig
+from latency_monitor.utils import parse_dig, parse_mtr
 
 
 class TestParseMtr:

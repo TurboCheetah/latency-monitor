@@ -1,6 +1,7 @@
-import pytest
-from unittest.mock import MagicMock, patch
 import sys
+from unittest.mock import MagicMock, patch
+
+import pytest
 
 
 @pytest.fixture
@@ -22,16 +23,18 @@ def mock_app(monkeypatch):
     mock_write_api = MagicMock()
     mock_influx_instance.write_api.return_value = mock_write_api
 
-    with patch("redis.Redis", return_value=mock_redis_instance):
-        with patch("influxdb_client.InfluxDBClient.from_env_properties", return_value=mock_influx_instance):
-            from latency_monitor.latency_monitor import app
+    with patch("redis.Redis", return_value=mock_redis_instance), patch(
+        "influxdb_client.InfluxDBClient.from_env_properties",
+        return_value=mock_influx_instance,
+    ):
+        from latency_monitor.latency_monitor import app
 
-            app.redis = mock_redis_instance
-            app.influx = mock_influx_instance
-            app.influx_write_api = mock_write_api
-            app.targets = ["8.8.8.8"]
+        app.redis = mock_redis_instance
+        app.influx = mock_influx_instance
+        app.influx_write_api = mock_write_api
+        app.targets = ["8.8.8.8"]
 
-            yield app
+        yield app
 
 
 class TestMtrFunction:
@@ -50,7 +53,8 @@ class TestMtrFunction:
             mock_run.assert_called_once_with(
                 ["mtr", "-rwznc", "10", "8.8.8.8"],
                 capture_output=True,
-                text=True
+                text=True,
+                check=False,
             )
             assert result["target"] == "8.8.8.8"
             assert result["stdout"] == mtr_output
@@ -71,7 +75,8 @@ class TestMtrFunction:
             mock_run.assert_called_once_with(
                 ["mtr", "-rwznc", "10", "-6", "2001:4860:4860::8888"],
                 capture_output=True,
-                text=True
+                text=True,
+                check=False,
             )
             assert result["target"] == "2001:4860:4860::8888"
 
@@ -112,7 +117,8 @@ class TestDigFunction:
             mock_run.assert_called_once_with(
                 ["dig", "google.com", "@8.8.8.8"],
                 capture_output=True,
-                text=True
+                text=True,
+                check=False,
             )
             assert result["target"] == "8.8.8.8"
             assert result["stdout"] == dig_output

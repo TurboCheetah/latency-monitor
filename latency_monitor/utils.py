@@ -1,5 +1,4 @@
 import re
-from typing import Dict, Union
 
 from rich.console import Console
 from rich.panel import Panel
@@ -9,7 +8,7 @@ from rich.text import Text
 console = Console()
 
 
-def parse_mtr(output: str, target_ip: str) -> Dict[str, Union[float, int]]:
+def parse_mtr(output: str, target_ip: str) -> dict[str, float | int]:
     """
     Extracts the latency values, loss percentage,
     and sent packets count for a specific target IP from the MTR output.

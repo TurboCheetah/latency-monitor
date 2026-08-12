@@ -23,12 +23,11 @@ def dig(target: str) -> dict:
     cmd = ["dig", "google.com", f"@{target}"]
     try:
         result = run_command(cmd)
-    except RuntimeError as exc:
+        parsed_output = parse_dig(result.stdout)
+    except (RuntimeError, ValueError) as exc:
         error = f"ERROR: {exc}"
         print_task_error("DIG", target, str(exc))
         return {"target": target, "stdout": error, "parsed_output": None}
-
-    parsed_output = parse_dig(result.stdout)
 
     print_dig_result(target, parsed_output)
 

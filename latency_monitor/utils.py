@@ -24,6 +24,8 @@ def run_command(command: list[str]) -> subprocess.CompletedProcess[str]:
         raise RuntimeError(
             f"{command[0]} timed out after {COMMAND_TIMEOUT_SECONDS} seconds"
         ) from exc
+    except OSError as exc:
+        raise RuntimeError(f"could not start {command[0]}: {exc}") from exc
 
     if result.returncode != 0:
         stderr = result.stderr.strip()

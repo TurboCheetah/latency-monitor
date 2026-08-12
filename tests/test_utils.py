@@ -43,6 +43,14 @@ class TestRunCommand:
         ):
             run_command(["dig", "google.com"])
 
+    def test_run_command_reports_process_start_failure(self):
+        failure = FileNotFoundError(2, "No such file or directory", "dig")
+
+        with patch("subprocess.run", side_effect=failure), pytest.raises(
+            RuntimeError, match="could not start dig"
+        ):
+            run_command(["dig", "google.com"])
+
 
 class TestParseMtr:
     def test_parse_mtr_valid_output(self):

@@ -45,7 +45,7 @@ assert "latency_monitor.dig.run_dig" in celery.tasks
             "celery",
             "-A",
             "latency_monitor.latency_monitor:celery",
-            "--help",
+            "report",
         ],
         env=environment,
         capture_output=True,

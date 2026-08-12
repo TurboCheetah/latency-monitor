@@ -26,12 +26,11 @@ def mtr(target: str) -> dict:
 
     try:
         result = run_command(cmd)
-    except RuntimeError as exc:
+        parsed_output = parse_mtr(result.stdout, target)
+    except (RuntimeError, ValueError) as exc:
         error = f"ERROR: {exc}"
         print_task_error("MTR", target, str(exc))
         return {"target": target, "stdout": error, "parsed_output": None}
-
-    parsed_output = parse_mtr(result.stdout, target)
 
     print_mtr_result(target, parsed_output)
 

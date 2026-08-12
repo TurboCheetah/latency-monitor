@@ -123,6 +123,31 @@ class TestRunMtrTask:
         )
         mock_app.influx_write_api.write.assert_not_called()
 
+    def test_run_mtr_task_keeps_successful_target_after_parse_failure(self, mock_app):
+        mock_app.targets = ["8.8.8.8", "1.1.1.1"]
+
+        def command_result(command, **_kwargs):
+            target = command[-1]
+            if target == "8.8.8.8":
+                return MagicMock(stdout="malformed output", stderr="", returncode=0)
+            return MagicMock(
+                stdout="""HOST: server                      Loss%   Snt   Last   Avg  Best  Wrst StDev
+  1.|-- 1.1.1.1                   0.0%    10   10.5  11.2   9.8  15.3   1.5""",
+                stderr="",
+                returncode=0,
+            )
+
+        with patch("subprocess.run", side_effect=command_result):
+            from latency_monitor.mtr import run_mtr
+
+            run_mtr()
+
+        assert mock_app.redis.set.call_count == 2
+        mock_app.redis.set.assert_any_call(
+            "mtr_8.8.8.8", "ERROR: Target IP 8.8.8.8 not found in MTR output."
+        )
+        mock_app.influx_write_api.write.assert_called_once()
+
 
 class TestDigFunction:
     def test_dig_function(self, mock_app):
@@ -194,5 +219,27 @@ class TestRunDigTask:
         mock_app.redis.set.assert_any_call(
             "dig_8.8.8.8", "ERROR: dig exited with status 9: network unreachable"
         )
+        mock_app.redis.set.assert_any_call("dig_1.1.1.1", ";; Query time: 15 msec")
+        mock_app.influx_write_api.write.assert_called_once()
+
+    def test_run_dig_task_keeps_successful_target_after_launch_failure(self, mock_app):
+        mock_app.targets = ["8.8.8.8", "1.1.1.1"]
+
+        def command_result(command, **_kwargs):
+            target = command[-1]
+            if target == "@8.8.8.8":
+                raise FileNotFoundError(2, "No such file or directory", "dig")
+            return MagicMock(
+                stdout=";; Query time: 15 msec", stderr="", returncode=0
+            )
+
+        with patch("subprocess.run", side_effect=command_result):
+            from latency_monitor.dig import run_dig
+
+            run_dig()
+
+        assert mock_app.redis.set.call_count == 2
+        launch_error = mock_app.redis.set.call_args_list[0].args[1]
+        assert launch_error.startswith("ERROR: could not start dig:")
         mock_app.redis.set.assert_any_call("dig_1.1.1.1", ";; Query time: 15 msec")
         mock_app.influx_write_api.write.assert_called_once()

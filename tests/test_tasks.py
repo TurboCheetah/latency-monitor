@@ -1,6 +1,7 @@
-import pytest
-from unittest.mock import MagicMock, patch
 import sys
+from unittest.mock import MagicMock, patch
+
+import pytest
 
 
 @pytest.fixture
@@ -22,16 +23,18 @@ def mock_app(monkeypatch):
     mock_write_api = MagicMock()
     mock_influx_instance.write_api.return_value = mock_write_api
 
-    with patch("redis.Redis", return_value=mock_redis_instance):
-        with patch("influxdb_client.InfluxDBClient.from_env_properties", return_value=mock_influx_instance):
-            from latency_monitor.latency_monitor import app
+    with patch("redis.Redis", return_value=mock_redis_instance), patch(
+        "influxdb_client.InfluxDBClient.from_env_properties",
+        return_value=mock_influx_instance,
+    ):
+        from latency_monitor.latency_monitor import app
 
-            app.redis = mock_redis_instance
-            app.influx = mock_influx_instance
-            app.influx_write_api = mock_write_api
-            app.targets = ["8.8.8.8"]
+        app.redis = mock_redis_instance
+        app.influx = mock_influx_instance
+        app.influx_write_api = mock_write_api
+        app.targets = ["8.8.8.8"]
 
-            yield app
+        yield app
 
 
 class TestMtrFunction:
@@ -41,6 +44,8 @@ class TestMtrFunction:
 
         mock_result = MagicMock()
         mock_result.stdout = mtr_output
+        mock_result.returncode = 0
+        mock_result.stderr = ""
 
         with patch("subprocess.run", return_value=mock_result) as mock_run:
             from latency_monitor.mtr import mtr
@@ -50,7 +55,9 @@ class TestMtrFunction:
             mock_run.assert_called_once_with(
                 ["mtr", "-rwznc", "10", "8.8.8.8"],
                 capture_output=True,
-                text=True
+                text=True,
+                check=False,
+                timeout=60,
             )
             assert result["target"] == "8.8.8.8"
             assert result["stdout"] == mtr_output
@@ -62,6 +69,8 @@ class TestMtrFunction:
 
         mock_result = MagicMock()
         mock_result.stdout = mtr_output
+        mock_result.returncode = 0
+        mock_result.stderr = ""
 
         with patch("subprocess.run", return_value=mock_result) as mock_run:
             from latency_monitor.mtr import mtr
@@ -71,7 +80,9 @@ class TestMtrFunction:
             mock_run.assert_called_once_with(
                 ["mtr", "-rwznc", "10", "-6", "2001:4860:4860::8888"],
                 capture_output=True,
-                text=True
+                text=True,
+                check=False,
+                timeout=60,
             )
             assert result["target"] == "2001:4860:4860::8888"
 
@@ -83,6 +94,8 @@ class TestRunMtrTask:
 
         mock_result = MagicMock()
         mock_result.stdout = mtr_output
+        mock_result.returncode = 0
+        mock_result.stderr = ""
 
         with patch("subprocess.run", return_value=mock_result):
             from latency_monitor.mtr import run_mtr
@@ -95,6 +108,46 @@ class TestRunMtrTask:
 
             mock_app.influx_write_api.write.assert_called_once()
 
+    def test_run_mtr_task_caches_failure_without_writing_metric(self, mock_app):
+        mock_result = MagicMock(
+            stdout="", stderr="mtr: permission denied", returncode=1
+        )
+
+        with patch("subprocess.run", return_value=mock_result):
+            from latency_monitor.mtr import run_mtr
+
+            run_mtr()
+
+        mock_app.redis.set.assert_called_once_with(
+            "mtr_8.8.8.8", "ERROR: mtr exited with status 1: mtr: permission denied"
+        )
+        mock_app.influx_write_api.write.assert_not_called()
+
+    def test_run_mtr_task_keeps_successful_target_after_parse_failure(self, mock_app):
+        mock_app.targets = ["8.8.8.8", "1.1.1.1"]
+
+        def command_result(command, **_kwargs):
+            target = command[-1]
+            if target == "8.8.8.8":
+                return MagicMock(stdout="malformed output", stderr="", returncode=0)
+            return MagicMock(
+                stdout="""HOST: server                      Loss%   Snt   Last   Avg  Best  Wrst StDev
+  1.|-- 1.1.1.1                   0.0%    10   10.5  11.2   9.8  15.3   1.5""",
+                stderr="",
+                returncode=0,
+            )
+
+        with patch("subprocess.run", side_effect=command_result):
+            from latency_monitor.mtr import run_mtr
+
+            run_mtr()
+
+        assert mock_app.redis.set.call_count == 2
+        mock_app.redis.set.assert_any_call(
+            "mtr_8.8.8.8", "ERROR: Target IP 8.8.8.8 not found in MTR output."
+        )
+        mock_app.influx_write_api.write.assert_called_once()
+
 
 class TestDigFunction:
     def test_dig_function(self, mock_app):
@@ -103,6 +156,8 @@ class TestDigFunction:
 
         mock_result = MagicMock()
         mock_result.stdout = dig_output
+        mock_result.returncode = 0
+        mock_result.stderr = ""
 
         with patch("subprocess.run", return_value=mock_result) as mock_run:
             from latency_monitor.dig import dig
@@ -112,7 +167,9 @@ class TestDigFunction:
             mock_run.assert_called_once_with(
                 ["dig", "google.com", "@8.8.8.8"],
                 capture_output=True,
-                text=True
+                text=True,
+                check=False,
+                timeout=60,
             )
             assert result["target"] == "8.8.8.8"
             assert result["stdout"] == dig_output
@@ -126,6 +183,8 @@ class TestRunDigTask:
 
         mock_result = MagicMock()
         mock_result.stdout = dig_output
+        mock_result.returncode = 0
+        mock_result.stderr = ""
 
         with patch("subprocess.run", return_value=mock_result):
             from latency_monitor.dig import run_dig
@@ -137,3 +196,50 @@ class TestRunDigTask:
             assert call_args[0][0] == "dig_8.8.8.8"
 
             mock_app.influx_write_api.write.assert_called_once()
+
+    def test_run_dig_task_keeps_successful_targets_when_one_fails(self, mock_app):
+        mock_app.targets = ["8.8.8.8", "1.1.1.1"]
+
+        def command_result(command, **_kwargs):
+            target = command[-1]
+            if target == "@8.8.8.8":
+                return MagicMock(
+                    stdout="", stderr="network unreachable", returncode=9
+                )
+            return MagicMock(
+                stdout=";; Query time: 15 msec", stderr="", returncode=0
+            )
+
+        with patch("subprocess.run", side_effect=command_result):
+            from latency_monitor.dig import run_dig
+
+            run_dig()
+
+        assert mock_app.redis.set.call_count == 2
+        mock_app.redis.set.assert_any_call(
+            "dig_8.8.8.8", "ERROR: dig exited with status 9: network unreachable"
+        )
+        mock_app.redis.set.assert_any_call("dig_1.1.1.1", ";; Query time: 15 msec")
+        mock_app.influx_write_api.write.assert_called_once()
+
+    def test_run_dig_task_keeps_successful_target_after_launch_failure(self, mock_app):
+        mock_app.targets = ["8.8.8.8", "1.1.1.1"]
+
+        def command_result(command, **_kwargs):
+            target = command[-1]
+            if target == "@8.8.8.8":
+                raise FileNotFoundError(2, "No such file or directory", "dig")
+            return MagicMock(
+                stdout=";; Query time: 15 msec", stderr="", returncode=0
+            )
+
+        with patch("subprocess.run", side_effect=command_result):
+            from latency_monitor.dig import run_dig
+
+            run_dig()
+
+        assert mock_app.redis.set.call_count == 2
+        launch_error = mock_app.redis.set.call_args_list[0].args[1]
+        assert launch_error.startswith("ERROR: could not start dig:")
+        mock_app.redis.set.assert_any_call("dig_1.1.1.1", ";; Query time: 15 msec")
+        mock_app.influx_write_api.write.assert_called_once()

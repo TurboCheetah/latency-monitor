@@ -1,3 +1,4 @@
+from importlib import import_module
 from os import environ
 
 from celery import Celery
@@ -9,7 +10,7 @@ from redis import Redis
 
 
 def parse_crontab(cron_expr: str) -> crontab:
-    """Parse a cron expression (minute hour day_of_month month_of_year day_of_week) into a crontab."""
+    """Parse a five-field cron expression into a Celery crontab schedule."""
     parts = cron_expr.split()
     if len(parts) != 5:
         raise ValueError(f"Invalid cron expression '{cron_expr}': expected 5 fields")
@@ -23,14 +24,19 @@ def parse_crontab(cron_expr: str) -> crontab:
 
 
 class App:
+    """Configured Flask, Celery, Redis, and InfluxDB application services."""
+
     def __init__(self) -> None:
+        """Create process-wide services from environment configuration."""
         self.flask = Flask(__name__)
 
         schedule = parse_crontab(environ.get("SCHEDULE", "*/5 * * * *"))
+        redis_host = environ.get("REDIS_HOST", "localhost")
+        redis_port = environ.get("REDIS_PORT", "6379")
 
         self.flask.config["CELERY_CONFIG"] = {
-            "broker_url": f"redis://{environ['REDIS_HOST']}:{environ['REDIS_PORT']}/0",
-            "result_backend": f"redis://{environ['REDIS_HOST']}:{environ['REDIS_PORT']}/0",
+            "broker_url": f"redis://{redis_host}:{redis_port}/0",
+            "result_backend": f"redis://{redis_host}:{redis_port}/0",
             "broker_connection_retry_on_startup": True,
             "beat_schedule": {
                 "mtr-task": {
@@ -47,21 +53,24 @@ class App:
         self.celery = Celery(self.flask.name)
         self.celery.conf.update(self.flask.config["CELERY_CONFIG"])
 
-        self.redis = Redis(host=environ["REDIS_HOST"], port=int(environ["REDIS_PORT"]))
+        self.redis = Redis(host=redis_host, port=int(redis_port))
 
         self.influx = InfluxDBClient.from_env_properties()
         self.influx_write_api = self.influx.write_api(write_options=SYNCHRONOUS)
         self.influx_query_api = self.influx.query_api()
 
-        self.targets = environ["TARGETS"].split(",")
+        self.targets = environ.get("TARGETS", "1.1.1.1").split(",")
 
 
 app = App()
 
-# import these so they are actually registered
-from . import routes as _  # noqa
-from . import mtr as _  # noqa
-from . import dig as _  # noqa
+# Register routes and Celery tasks after the singleton is available. These
+# imports are intentionally kept here so every module receives the same App.
+from .app_instance import set_app
+
+set_app(app)
+for module_name in ("dig", "mtr", "routes"):
+    import_module(f"{__package__}.{module_name}")
 
 flask = app.flask
 celery = app.celery

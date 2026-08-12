@@ -1,22 +1,36 @@
-import subprocess
 from concurrent.futures import ThreadPoolExecutor
 from os import environ
 
 from influxdb_client import Point
 
-from .latency_monitor import app
-from .utils import parse_mtr, print_mtr_result, print_task_complete, print_task_start
+from .app_instance import get_app
+from .utils import (
+    parse_mtr,
+    print_mtr_result,
+    print_task_complete,
+    print_task_error,
+    print_task_start,
+    run_command,
+)
+
+app = get_app()
 
 
 def mtr(target: str) -> dict:
+    """Run MTR for one target and return raw and parsed results."""
     print_task_start("MTR", target)
 
     cmd = ["mtr", "-rwznc", "10", target]
     if ":" in target:
         cmd = ["mtr", "-rwznc", "10", "-6", target]
 
-    result = subprocess.run(cmd, capture_output=True, text=True)
-    parsed_output = parse_mtr(result.stdout, target)
+    try:
+        result = run_command(cmd)
+        parsed_output = parse_mtr(result.stdout, target)
+    except (RuntimeError, ValueError) as exc:
+        error = f"ERROR: {exc}"
+        print_task_error("MTR", target, str(exc))
+        return {"target": target, "stdout": error, "parsed_output": None}
 
     print_mtr_result(target, parsed_output)
 
@@ -25,7 +39,7 @@ def mtr(target: str) -> dict:
 
 @app.celery.task
 def run_mtr() -> None:
-    """Run the MTR command and update the global variable with the results."""
+    """Run MTR for all configured targets and store the results."""
     with ThreadPoolExecutor() as executor:
         results = list(executor.map(mtr, app.targets))
 
@@ -34,6 +48,9 @@ def run_mtr() -> None:
     for res in results:
         target = res["target"]
         app.redis.set(f"mtr_{target}", res["stdout"])
+
+        if res["parsed_output"] is None:
+            continue
 
         p = (
             Point("mtr")

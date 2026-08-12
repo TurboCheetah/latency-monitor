@@ -24,7 +24,7 @@ def get_app() -> App:
     """Return the process-wide application instance."""
     global _app
     if _app is None:
-        from .latency_monitor import App
+        from .latency_monitor import app
 
-        _app = App()
+        _app = app
     return _app

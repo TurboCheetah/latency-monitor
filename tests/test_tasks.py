@@ -44,6 +44,8 @@ class TestMtrFunction:
 
         mock_result = MagicMock()
         mock_result.stdout = mtr_output
+        mock_result.returncode = 0
+        mock_result.stderr = ""
 
         with patch("subprocess.run", return_value=mock_result) as mock_run:
             from latency_monitor.mtr import mtr
@@ -55,6 +57,7 @@ class TestMtrFunction:
                 capture_output=True,
                 text=True,
                 check=False,
+                timeout=60,
             )
             assert result["target"] == "8.8.8.8"
             assert result["stdout"] == mtr_output
@@ -66,6 +69,8 @@ class TestMtrFunction:
 
         mock_result = MagicMock()
         mock_result.stdout = mtr_output
+        mock_result.returncode = 0
+        mock_result.stderr = ""
 
         with patch("subprocess.run", return_value=mock_result) as mock_run:
             from latency_monitor.mtr import mtr
@@ -77,6 +82,7 @@ class TestMtrFunction:
                 capture_output=True,
                 text=True,
                 check=False,
+                timeout=60,
             )
             assert result["target"] == "2001:4860:4860::8888"
 
@@ -88,6 +94,8 @@ class TestRunMtrTask:
 
         mock_result = MagicMock()
         mock_result.stdout = mtr_output
+        mock_result.returncode = 0
+        mock_result.stderr = ""
 
         with patch("subprocess.run", return_value=mock_result):
             from latency_monitor.mtr import run_mtr
@@ -100,6 +108,21 @@ class TestRunMtrTask:
 
             mock_app.influx_write_api.write.assert_called_once()
 
+    def test_run_mtr_task_caches_failure_without_writing_metric(self, mock_app):
+        mock_result = MagicMock(
+            stdout="", stderr="mtr: permission denied", returncode=1
+        )
+
+        with patch("subprocess.run", return_value=mock_result):
+            from latency_monitor.mtr import run_mtr
+
+            run_mtr()
+
+        mock_app.redis.set.assert_called_once_with(
+            "mtr_8.8.8.8", "ERROR: mtr exited with status 1: mtr: permission denied"
+        )
+        mock_app.influx_write_api.write.assert_not_called()
+
 
 class TestDigFunction:
     def test_dig_function(self, mock_app):
@@ -108,6 +131,8 @@ class TestDigFunction:
 
         mock_result = MagicMock()
         mock_result.stdout = dig_output
+        mock_result.returncode = 0
+        mock_result.stderr = ""
 
         with patch("subprocess.run", return_value=mock_result) as mock_run:
             from latency_monitor.dig import dig
@@ -119,6 +144,7 @@ class TestDigFunction:
                 capture_output=True,
                 text=True,
                 check=False,
+                timeout=60,
             )
             assert result["target"] == "8.8.8.8"
             assert result["stdout"] == dig_output
@@ -132,6 +158,8 @@ class TestRunDigTask:
 
         mock_result = MagicMock()
         mock_result.stdout = dig_output
+        mock_result.returncode = 0
+        mock_result.stderr = ""
 
         with patch("subprocess.run", return_value=mock_result):
             from latency_monitor.dig import run_dig
@@ -143,3 +171,28 @@ class TestRunDigTask:
             assert call_args[0][0] == "dig_8.8.8.8"
 
             mock_app.influx_write_api.write.assert_called_once()
+
+    def test_run_dig_task_keeps_successful_targets_when_one_fails(self, mock_app):
+        mock_app.targets = ["8.8.8.8", "1.1.1.1"]
+
+        def command_result(command, **_kwargs):
+            target = command[-1]
+            if target == "@8.8.8.8":
+                return MagicMock(
+                    stdout="", stderr="network unreachable", returncode=9
+                )
+            return MagicMock(
+                stdout=";; Query time: 15 msec", stderr="", returncode=0
+            )
+
+        with patch("subprocess.run", side_effect=command_result):
+            from latency_monitor.dig import run_dig
+
+            run_dig()
+
+        assert mock_app.redis.set.call_count == 2
+        mock_app.redis.set.assert_any_call(
+            "dig_8.8.8.8", "ERROR: dig exited with status 9: network unreachable"
+        )
+        mock_app.redis.set.assert_any_call("dig_1.1.1.1", ";; Query time: 15 msec")
+        mock_app.influx_write_api.write.assert_called_once()

@@ -24,7 +24,10 @@ def parse_crontab(cron_expr: str) -> crontab:
 
 
 class App:
+    """Configured Flask, Celery, Redis, and InfluxDB application services."""
+
     def __init__(self) -> None:
+        """Create process-wide services from environment configuration."""
         self.flask = Flask(__name__)
 
         schedule = parse_crontab(environ.get("SCHEDULE", "*/5 * * * *"))

@@ -1,6 +1,47 @@
+import subprocess
+from unittest.mock import patch
+
 import pytest
 
-from latency_monitor.utils import parse_dig, parse_mtr
+from latency_monitor.utils import (
+    COMMAND_TIMEOUT_SECONDS,
+    parse_dig,
+    parse_mtr,
+    run_command,
+)
+
+
+class TestRunCommand:
+    def test_run_command_passes_timeout_and_returns_success(self):
+        completed = subprocess.CompletedProcess(["dig"], 0, "output", "")
+
+        with patch("subprocess.run", return_value=completed) as run:
+            result = run_command(["dig", "google.com"])
+
+        run.assert_called_once_with(
+            ["dig", "google.com"],
+            capture_output=True,
+            text=True,
+            check=False,
+            timeout=COMMAND_TIMEOUT_SECONDS,
+        )
+        assert result is completed
+
+    def test_run_command_reports_nonzero_exit_with_stderr(self):
+        completed = subprocess.CompletedProcess(["mtr"], 2, "", "permission denied")
+
+        with patch("subprocess.run", return_value=completed), pytest.raises(
+            RuntimeError, match="mtr exited with status 2: permission denied"
+        ):
+            run_command(["mtr", "example.com"])
+
+    def test_run_command_reports_timeout(self):
+        timeout = subprocess.TimeoutExpired(["dig"], COMMAND_TIMEOUT_SECONDS)
+
+        with patch("subprocess.run", side_effect=timeout), pytest.raises(
+            RuntimeError, match="dig timed out after 60 seconds"
+        ):
+            run_command(["dig", "google.com"])
 
 
 class TestParseMtr:

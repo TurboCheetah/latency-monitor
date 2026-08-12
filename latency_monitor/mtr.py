@@ -1,11 +1,17 @@
-import subprocess
 from concurrent.futures import ThreadPoolExecutor
 from os import environ
 
 from influxdb_client import Point
 
 from .app_instance import get_app
-from .utils import parse_mtr, print_mtr_result, print_task_complete, print_task_start
+from .utils import (
+    parse_mtr,
+    print_mtr_result,
+    print_task_complete,
+    print_task_error,
+    print_task_start,
+    run_command,
+)
 
 app = get_app()
 
@@ -18,7 +24,13 @@ def mtr(target: str) -> dict:
     if ":" in target:
         cmd = ["mtr", "-rwznc", "10", "-6", target]
 
-    result = subprocess.run(cmd, capture_output=True, text=True, check=False)
+    try:
+        result = run_command(cmd)
+    except RuntimeError as exc:
+        error = f"ERROR: {exc}"
+        print_task_error("MTR", target, str(exc))
+        return {"target": target, "stdout": error, "parsed_output": None}
+
     parsed_output = parse_mtr(result.stdout, target)
 
     print_mtr_result(target, parsed_output)
@@ -37,6 +49,9 @@ def run_mtr() -> None:
     for res in results:
         target = res["target"]
         app.redis.set(f"mtr_{target}", res["stdout"])
+
+        if res["parsed_output"] is None:
+            continue
 
         p = (
             Point("mtr")

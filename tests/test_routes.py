@@ -1,3 +1,4 @@
+import sys
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -18,6 +19,10 @@ def client(monkeypatch):
     mock_write_api = MagicMock()
     mock_celery = MagicMock()
 
+    for module_name in list(sys.modules):
+        if module_name.startswith("latency_monitor"):
+            del sys.modules[module_name]
+
     with patch("redis.Redis", return_value=mock_redis), patch(
         "influxdb_client.InfluxDBClient.from_env_properties",
         return_value=mock_influx,
@@ -25,14 +30,18 @@ def client(monkeypatch):
         mock_influx.write_api.return_value = mock_write_api
         from latency_monitor.latency_monitor import app
 
-        app.redis = mock_redis
-        app.influx = mock_influx
-        app.influx_write_api = mock_write_api
-        app.celery = mock_celery
-        app.targets = ["8.8.8.8", "1.1.1.1"]
+        monkeypatch.setattr(app, "redis", mock_redis)
+        monkeypatch.setattr(app, "influx", mock_influx)
+        monkeypatch.setattr(app, "influx_write_api", mock_write_api)
+        monkeypatch.setattr(app, "celery", mock_celery)
+        monkeypatch.setattr(app, "targets", ["8.8.8.8", "1.1.1.1"])
 
         with app.flask.test_client() as test_client:
             yield test_client, mock_redis, mock_celery
+
+    for module_name in list(sys.modules):
+        if module_name.startswith("latency_monitor"):
+            del sys.modules[module_name]
 
 
 class TestRoutes:

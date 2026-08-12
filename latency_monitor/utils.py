@@ -1,4 +1,5 @@
 import re
+import subprocess
 
 from rich.console import Console
 from rich.panel import Panel
@@ -6,6 +7,32 @@ from rich.table import Table
 from rich.text import Text
 
 console = Console()
+COMMAND_TIMEOUT_SECONDS = 60
+
+
+def run_command(command: list[str]) -> subprocess.CompletedProcess[str]:
+    """Run a monitoring command with a bounded runtime and useful failures."""
+    try:
+        result = subprocess.run(
+            command,
+            capture_output=True,
+            text=True,
+            check=False,
+            timeout=COMMAND_TIMEOUT_SECONDS,
+        )
+    except subprocess.TimeoutExpired as exc:
+        raise RuntimeError(
+            f"{command[0]} timed out after {COMMAND_TIMEOUT_SECONDS} seconds"
+        ) from exc
+
+    if result.returncode != 0:
+        stderr = result.stderr.strip()
+        detail = f": {stderr}" if stderr else ""
+        raise RuntimeError(
+            f"{command[0]} exited with status {result.returncode}{detail}"
+        )
+
+    return result
 
 
 def parse_mtr(output: str, target_ip: str) -> dict[str, float | int]:
@@ -117,6 +144,14 @@ def print_task_start(task_name: str, target: str) -> None:
     console.print(
         f"[dim]{'─' * 40}[/]\n"
         f"[bold blue]▶[/] Running [cyan]{task_name}[/] for [magenta]{target}[/]"
+    )
+
+
+def print_task_error(task_name: str, target: str, error: str) -> None:
+    """Print a monitoring command failure without aborting other targets."""
+    console.print(
+        f"[bold red]✖[/] [cyan]{task_name}[/] failed for "
+        f"[magenta]{target}[/]: {error}"
     )
 
 

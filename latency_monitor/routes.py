@@ -21,6 +21,7 @@ def _cached_results(prefix: str) -> dict[str, str]:
 
 @app.flask.route("/")
 def index() -> tuple[str, int]:
+    """Render the monitor dashboard with cached MTR and DIG output."""
     return (
         render_template(
             "index.html",
@@ -34,6 +35,7 @@ def index() -> tuple[str, int]:
 
 @app.flask.route("/json")
 def json() -> tuple[Response, int]:
+    """Return cached monitoring results as JSON."""
     response = {
         "mtr": {
             "targets": app.targets,
@@ -51,11 +53,13 @@ def json() -> tuple[Response, int]:
 
 @app.flask.route("/trigger-mtr")
 def trigger_mtr() -> tuple[Response, int]:
+    """Queue an immediate MTR collection task."""
     result = app.celery.send_task("latency_monitor.mtr.run_mtr")
     return jsonify({"task_id": result.id}), 202
 
 
 @app.flask.route("/trigger-dig")
 def trigger_dig() -> tuple[Response, int]:
+    """Queue an immediate DIG collection task."""
     result = app.celery.send_task("latency_monitor.dig.run_dig")
     return jsonify({"task_id": result.id}), 202

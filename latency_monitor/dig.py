@@ -1,11 +1,17 @@
-import subprocess
 from concurrent.futures import ThreadPoolExecutor
 from os import environ
 
 from influxdb_client import Point
 
 from .app_instance import get_app
-from .utils import parse_dig, print_dig_result, print_task_complete, print_task_start
+from .utils import (
+    parse_dig,
+    print_dig_result,
+    print_task_complete,
+    print_task_error,
+    print_task_start,
+    run_command,
+)
 
 app = get_app()
 
@@ -15,7 +21,13 @@ def dig(target: str) -> dict:
     print_task_start("DIG", target)
 
     cmd = ["dig", "google.com", f"@{target}"]
-    result = subprocess.run(cmd, capture_output=True, text=True, check=False)
+    try:
+        result = run_command(cmd)
+    except RuntimeError as exc:
+        error = f"ERROR: {exc}"
+        print_task_error("DIG", target, str(exc))
+        return {"target": target, "stdout": error, "parsed_output": None}
+
     parsed_output = parse_dig(result.stdout)
 
     print_dig_result(target, parsed_output)
@@ -34,6 +46,9 @@ def run_dig() -> None:
     for res in results:
         target = res["target"]
         app.redis.set(f"dig_{target}", res["stdout"])
+
+        if res["parsed_output"] is None:
+            continue
 
         p = (
             Point("dig")

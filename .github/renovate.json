@@ -27,15 +27,6 @@
         "major"
       ],
       "automerge": false
-    },
-    {
-      "matchJsonata": [
-        "$exists(vulnerabilityFixVersion)"
-      ],
-      "addLabels": [
-        "security"
-      ],
-      "automerge": true
     }
   ],
   "osvVulnerabilityAlerts": true,
@@ -43,7 +34,6 @@
     "addLabels": [
       "security"
     ],
-    "automerge": true,
     "vulnerabilityFixStrategy": "lowest"
   }
 }
